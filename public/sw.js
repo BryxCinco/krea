@@ -5,12 +5,12 @@
  * model files tools download. User files never pass through here: they are
  * read from memory in the page and are not part of any request.
  */
-const VERSION = "krea-v1";
+const VERSION = "krea-v2";
 const SHELL = `${VERSION}-shell`; // pages and build assets
-const MODELS = `${VERSION}-models`; // third-party model/weight downloads (background removal, OCR)
+const MODELS = `${VERSION}-models`; // third-party model downloads (background removal)
 
 /** Hosts that serve public, versioned model files to the on-device tools. */
-const MODEL_HOSTS = ["staticimgly.com", "cdn.jsdelivr.net", "tessdata.projectnaptha.com"];
+const MODEL_HOSTS = ["staticimgly.com"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -68,8 +68,9 @@ self.addEventListener("fetch", (event) => {
   }
   if (url.origin !== self.location.origin) return;
 
-  // Build assets are content-hashed, so a cached copy is always correct.
-  if (url.pathname.startsWith("/_next/static/")) {
+  // Build assets are content-hashed, and vendored engines (pdf.js, qpdf, Tesseract)
+  // only change with a new deploy, which bumps VERSION. A cached copy is correct.
+  if (["/_next/static/", "/pdfjs/", "/vendor/", "/tesseract/"].some((prefix) => url.pathname.startsWith(prefix))) {
     event.respondWith(cacheFirst(request, SHELL));
     return;
   }

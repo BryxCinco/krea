@@ -23,6 +23,8 @@ export function ServiceWorker() {
             // pdf.js's own workers, so PDF rendering is available offline too.
             "/pdfjs/pdf.worker.min.mjs",
             "/pdfjs/pdf.renderer.min.mjs",
+            // qpdf, for Protect / Unlock PDF (1.3 MB). OCR files (about 10 MB) are cached on first use instead.
+            "/vendor/qpdf/qpdf.wasm",
           ],
         });
       })

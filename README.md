@@ -1,8 +1,8 @@
 # Krea (Kinetic Render Engine)
 
-A local-first, privacy-first file toolkit. Compress, resize and convert images, make ID photos, merge and split PDFs, all inside your browser. There is no backend, no database and no account. Files never leave the device.
+A local-first, privacy-first file toolkit. Compress, resize, watermark and convert images, make ID photos and collages, merge, compress, sign and password-protect PDFs, and read text with OCR, all inside your browser. There is no backend, no database and no account. Files never leave the device.
 
-> Status: Milestone 1 of 3. Ten of the 25 planned tools are implemented; see [Roadmap](#roadmap).
+> Status: Milestone 2 of 3. Twenty of the 25 planned tools are implemented; see [Roadmap](#roadmap).
 
 ## Setup
 
@@ -20,23 +20,26 @@ npm run build
 npm run start
 ```
 
-Other scripts: `npm run lint`, `npm run typecheck`. `npm run assets` copies pdf.js runtime files into `public/pdfjs/`; it runs automatically before `dev` and `build`.
+Other scripts: `npm run lint`, `npm run typecheck`. `npm run assets` copies the pdf.js, qpdf (WebAssembly) and Tesseract OCR runtime files from `node_modules` into `public/`; it runs automatically before `dev` and `build`, so Krea serves them itself instead of using a CDN.
 
 The service worker (offline support) only registers in a production build, so test offline behaviour with `npm run build && npm run start`.
 
 ## How it works
 
-- **The Stage** (`/`) is one large dropzone. Drop, paste or pick files; Krea sniffs the real file type and offers the Moves that fit.
-- **Command Palette**: `Ctrl+K` or `/` jumps to any tool.
+- **Home** has the Stage on top and the tool cards below. Drop, paste or pick files; Krea sniffs the real file type, offers the Moves that fit, and highlights the matching cards.
+- **Render Chains** (Chains button or header link): line up Moves, run them in one go, and save them as presets in this browser. Built in: Gov Portal Ready, 2x2 ID Photo, Email-Safe PDF. Steps that cannot follow each other are blocked with the reason.
+- **Themes**: Dark (default), Light and System, remembered in this browser.
+- **Command Palette**: `Ctrl+K` or `/` jumps to any tool, opens Chains, or switches the theme.
 - **Tool pages** (`/tools/[slug]`) show the same workspace locked to one tool. `/tools` lists everything.
-- **Workers**: tools run inside Web Workers, so the page stays responsive and Cancel simply terminates the worker. PDF rendering is the one exception: pdf.js needs the DOM, so it is driven from the page while pdf.js's own workers parse and rasterize.
-- **Offline**: after the first visit the service worker caches the app's code. Switch on airplane mode and it still works.
+- **Workers**: tools run inside Web Workers, so the page stays responsive and Cancel simply terminates the worker. PDF rendering and OCR are the exceptions: they are driven from the page while pdf.js and Tesseract do the heavy work in their own workers.
+- **Offline**: after the first visit the service worker caches the app's code. Switch on airplane mode and it still works. OCR's engine and language data (about 10 MB) are cached the first time you run OCR.
 
 ### Privacy
 
 - Files are held in memory only. **Wipe session** clears them and stops every worker.
 - No analytics. Fonts are self-hosted at build time.
-- The only third-party request is a one-time download of the background-removal model from IMG.LY's CDN (`staticimgly.com`), used by Background Remover and ID Photo Maker. It is a download of public model files; your photo is not sent. The service worker caches it for offline use.
+- The only third-party request is a one-time download of the background-removal model from IMG.LY's CDN (`staticimgly.com`), used by Background Remover and ID Photo Maker. It is a download of public model files; your photo is not sent. The service worker caches it for offline use. OCR language data (English, Filipino) and the PDF encryption engine are self-hosted.
+- Passwords typed into Protect / Unlock are never stored, and that Move cannot be saved in a chain.
 
 ## Adding a tool
 
@@ -54,6 +57,7 @@ The service worker (offline support) only registers in a production build, so te
      seoTitle: "...",
      seoDescription: "...",
      howTo: ["Drop an image.", "Download the result."],
+     output: "image", // what comes out, so Render Chains can check that steps fit
      icon: "convert",
      worker: "image",
      input: "each", // batch-capable; "all" combines every file into one result
@@ -85,5 +89,5 @@ Or from the terminal: `npx vercel` for a preview, `npx vercel --prod` for produc
 ## Roadmap
 
 - **Milestone 1 (done)**: Stage, Command Palette, registry, workers, PWA; Image Compressor, Resizer, Crop & Rotate, Format Converter, Background Remover, ID Photo Maker; Merge PDFs, Split PDF, PDF to Image, Image to PDF.
-- **Milestone 2**: Watermark, Upscaler, Palette Extractor, Collage; Compress PDF, PDF Watermark, Sign, Protect/Unlock, Page Organizer, OCR; Render Chains and presets.
+- **Milestone 2 (done)**: header, card grid and Dark/Light/System themes; Watermark, Upscaler, Palette Extractor, Collage; Compress PDF, PDF Watermark, Sign, Protect/Unlock, Page Organizer, OCR; Render Chains and presets.
 - **Milestone 3**: Markdown Editor, Resume Builder, Invoice Generator, QR Code Generator, PH Take-Home Pay Calculator; SEO, performance and accessibility pass.
