@@ -11,6 +11,7 @@ export const split: Tool = {
   category: "pdf",
   description: "Split a PDF by page ranges, every N pages, or pull out just the pages you select.",
   accepts: [PDF_MIME],
+  output: "pdf",
   seoTitle: "Split PDF: extract pages or ranges without uploading",
   seoDescription:
     "Split a PDF by range, every N pages or selected pages. Everything runs in your browser, so the document stays on your device.",

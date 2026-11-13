@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Vendored pdf.js runtime assets and the hand-written service worker.
     "public/pdfjs/**",
+    "public/vendor/**",
+    "public/tesseract/**",
   ]),
 ]);
 

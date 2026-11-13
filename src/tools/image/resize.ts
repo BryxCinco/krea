@@ -11,6 +11,7 @@ export const resize: Tool = {
   category: "image",
   description: "Resize images to exact pixels or a percentage, with presets for ID photos and screens.",
   accepts: IMAGE_MIMES,
+  output: "image",
   seoTitle: "Image Resizer: exact pixels, percent and ID photo presets",
   seoDescription:
     "Resize JPG, PNG and WebP images to exact dimensions in your browser. Lock the aspect ratio, batch resize, download as ZIP. No upload.",

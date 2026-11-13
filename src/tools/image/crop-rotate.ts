@@ -11,6 +11,7 @@ export const cropRotate: Tool = {
   category: "image",
   description: "Crop freely or to standard ratios, then rotate and flip.",
   accepts: IMAGE_MIMES,
+  output: "image",
   seoTitle: "Crop and Rotate Images: 1:1, 4:3, 16:9 and 2x2 ratios",
   seoDescription:
     "Crop, rotate and flip photos in your browser. Free crop or locked ratios including 1:1, 4:3, 16:9 and 2x2 ID. No upload needed.",

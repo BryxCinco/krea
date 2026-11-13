@@ -11,6 +11,7 @@ export const convert: Tool = {
   category: "image",
   description: "Convert between JPG, PNG and WebP, one file or a whole batch.",
   accepts: IMAGE_MIMES,
+  output: "image",
   seoTitle: "Image Format Converter: JPG, PNG, WebP in batch",
   seoDescription:
     "Convert images between JPG, PNG and WebP in your browser. Batch convert and download a ZIP. Private: files never leave your device.",

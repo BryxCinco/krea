@@ -30,6 +30,7 @@ export const idPhoto: Tool = {
   category: "image",
   description: "Make 2x2, 1x1 and passport-size photos at 300 DPI with a white or blue background and a print-ready sheet.",
   accepts: IMAGE_MIMES,
+  output: "image",
   seoTitle: "ID Photo Maker: 2x2, 1x1 and passport size, print ready",
   seoDescription:
     "Create 2x2, 1x1 and passport ID photos at 300 DPI in your browser. White or blue background, 4R and A4 print sheets. Your photo never leaves your device.",

@@ -12,6 +12,7 @@ export const removeBackground: Tool = {
   category: "image",
   description: "Cut out the subject with an AI model that runs on your device. Keep it transparent or add a colour.",
   accepts: IMAGE_MIMES,
+  output: "image",
   seoTitle: "Background Remover: on-device AI, no upload",
   seoDescription:
     "Remove image backgrounds privately. The AI model runs in your browser, so your photo is never uploaded. Export transparent PNG or a solid colour.",

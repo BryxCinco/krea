@@ -45,6 +45,9 @@ export async function openPdf(file: WorkFile): Promise<OpenPdf> {
 
 export interface RenderedPage {
   blob: Blob;
+  /** Rendered size in pixels. */
+  width: number;
+  height: number;
   /** True when the page was rendered below the requested scale to stay memory-safe. */
   reduced: boolean;
 }
@@ -71,10 +74,11 @@ export async function renderPage(
     await page.render({ canvas, viewport, background: "#ffffff" }).promise;
 
     const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, mime, quality));
+    const { width, height } = canvas;
     // Shrinking the canvas releases its backing store right away instead of waiting for GC.
     canvas.width = canvas.height = 0;
     if (!blob) throw new KreaError("failed", `Page ${pageIndex + 1} could not be converted to an image.`);
-    return { blob, reduced };
+    return { blob, reduced, width, height };
   } finally {
     page.cleanup();
   }

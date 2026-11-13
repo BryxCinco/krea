@@ -4,25 +4,36 @@
  * Renders a tool's declarative settings schema (OptionField[]) as form
  * controls. Tools never ship their own settings UI; they only describe fields.
  */
+import { ImagePlus, X } from "lucide-react";
 import { useId } from "react";
 import type { OptionField, OptionValue, OptionValues, Tool } from "@/tools/types";
 import { PagePicker } from "./page-picker";
+import { SignaturePad } from "./signature-pad";
 
 interface FieldsProps {
   tool: Tool;
   values: OptionValues;
   /** Page count of the first PDF on the Stage, for page pickers. */
   pageCount?: number;
+  /**
+   * Chain steps are edited without the Stage, so fields that need it (crop box,
+   * signature placement, page thumbnails) and presets are left out.
+   */
+  compact?: boolean;
   onChange: (patch: OptionValues) => void;
 }
 
 const inputClass =
   "min-h-10 w-full rounded-md border border-line bg-ink px-3 font-mono text-sm text-fg placeholder:text-muted/70 hover:border-muted";
 
-export function Fields({ tool, values, pageCount, onChange }: FieldsProps) {
+/** Largest logo we keep in settings (as a data URL). Bigger files are refused with a message. */
+const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+
+export function Fields({ tool, values, pageCount, compact = false, onChange }: FieldsProps) {
+  const stageOnly = (field: OptionField) => field.type === "crop" || field.type === "placement" || field.type === "pageGrid";
   return (
     <div className="flex flex-col gap-5">
-      {tool.presets && (
+      {tool.presets && !compact && (
         <div>
           <p className="mb-2 text-xs uppercase tracking-widest text-muted">Presets</p>
           <div className="flex flex-wrap gap-2">
@@ -36,7 +47,7 @@ export function Fields({ tool, values, pageCount, onChange }: FieldsProps) {
                   aria-pressed={active}
                   onClick={() => onChange(preset.values)}
                   className={`min-h-9 rounded-full border px-3 text-sm transition-colors ${
-                    active ? "border-lime bg-lime text-ink" : "border-line text-fg hover:border-lime"
+                    active ? "border-accent bg-lime text-on-lime" : "border-line text-fg hover:border-accent"
                   }`}
                 >
                   {preset.label}
@@ -47,7 +58,7 @@ export function Fields({ tool, values, pageCount, onChange }: FieldsProps) {
         </div>
       )}
       {tool.fields
-        .filter((field) => !field.showIf || field.showIf(values))
+        .filter((field) => (!field.showIf || field.showIf(values)) && !(compact && stageOnly(field)))
         .map((field) => (
           <Field
             key={field.key}
@@ -56,7 +67,13 @@ export function Fields({ tool, values, pageCount, onChange }: FieldsProps) {
             pageCount={pageCount}
             onChange={(value) => onChange({ [field.key]: value })}
             onReset={() =>
-              onChange({ [`${field.key}X`]: 0, [`${field.key}Y`]: 0, [`${field.key}W`]: 1, [`${field.key}H`]: 1 })
+              onChange(
+                field.type === "pageGrid"
+                  ? { [field.key]: "" }
+                  : field.type === "placement"
+                    ? { [`${field.key}X`]: 0.55, [`${field.key}Y`]: 0.8, [`${field.key}W`]: 0.35, [`${field.key}H`]: 0.1 }
+                    : { [`${field.key}X`]: 0, [`${field.key}Y`]: 0, [`${field.key}W`]: 1, [`${field.key}H`]: 1 },
+              )
             }
           />
         ))}
@@ -94,7 +111,7 @@ function Field({ field, value, pageCount, onChange, onReset }: FieldProps) {
             <label htmlFor={id} className="text-sm text-fg">
               {field.label}
             </label>
-            <output htmlFor={id} className="font-mono text-sm text-lime">
+            <output htmlFor={id} className="font-mono text-sm text-accent">
               {String(value)}
               {field.unit}
             </output>
@@ -122,9 +139,9 @@ function Field({ field, value, pageCount, onChange, onReset }: FieldProps) {
             <input
               id={id}
               type="number"
-              inputMode="numeric"
+              inputMode="decimal"
               min={field.min}
-              max={field.max}
+              max={field.max ?? (field.key === "page" ? pageCount : undefined)}
               step={field.step}
               value={Number.isFinite(value) ? Number(value) : ""}
               aria-describedby={hintId}
@@ -151,8 +168,8 @@ function Field({ field, value, pageCount, onChange, onReset }: FieldProps) {
               {field.options.map((option) => (
                 <label
                   key={option.value}
-                  className={`flex min-h-9 cursor-pointer items-center justify-center rounded px-2 text-center text-sm transition-colors has-focus-visible:outline-2 has-focus-visible:outline-lime ${
-                    value === option.value ? "bg-raised text-lime" : "text-muted hover:text-fg"
+                  className={`flex min-h-9 cursor-pointer items-center justify-center rounded px-2 text-center text-sm transition-colors has-focus-visible:outline-2 has-focus-visible:outline-accent ${
+                    value === option.value ? "bg-raised text-accent" : "text-muted hover:text-fg"
                   }`}
                 >
                   <input
@@ -204,12 +221,12 @@ function Field({ field, value, pageCount, onChange, onReset }: FieldProps) {
             aria-labelledby={`${id}-label`}
             onClick={() => onChange(!value)}
             className={`relative h-7 w-12 shrink-0 rounded-full border transition-colors ${
-              value ? "border-lime bg-lime" : "border-line bg-ink"
+              value ? "border-accent bg-lime" : "border-line bg-ink"
             }`}
           >
             <span
               className={`absolute top-1/2 size-5 -translate-y-1/2 rounded-full transition-all ${
-                value ? "left-6 bg-ink" : "left-0.5 bg-muted"
+                value ? "left-6 bg-on-lime" : "left-0.5 bg-muted"
               }`}
             />
           </button>
@@ -241,7 +258,8 @@ function Field({ field, value, pageCount, onChange, onReset }: FieldProps) {
           {label}
           <input
             id={id}
-            type="text"
+            type={field.secret ? "password" : "text"}
+            autoComplete={field.secret ? "new-password" : "off"}
             value={String(value)}
             placeholder={field.placeholder}
             aria-describedby={hintId}
@@ -261,12 +279,69 @@ function Field({ field, value, pageCount, onChange, onReset }: FieldProps) {
         </div>
       );
 
+    case "image":
+      return (
+        <div>
+          <span className="mb-1.5 block text-sm text-fg">{field.label}</span>
+          {value ? (
+            <div className="flex items-center gap-3 rounded-md border border-line p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element -- data URL */}
+              <img src={String(value)} alt="Selected logo" className="checkerboard size-14 rounded object-contain" />
+              <span className="flex-1 text-sm text-muted">Logo loaded</span>
+              <button
+                type="button"
+                aria-label="Remove logo"
+                onClick={() => onChange("")}
+                className="flex size-9 items-center justify-center rounded text-muted hover:text-signal"
+              >
+                <X aria-hidden className="size-4" strokeWidth={1.75} />
+              </button>
+            </div>
+          ) : (
+            <label className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-line text-sm text-fg hover:border-accent has-focus-visible:outline-2 has-focus-visible:outline-accent">
+              <ImagePlus aria-hidden className="size-4" strokeWidth={1.75} />
+              Choose image
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                aria-describedby={hintId}
+                className="sr-only"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  event.target.value = "";
+                  if (!file || file.size > MAX_IMAGE_BYTES) {
+                    if (file) window.alert("That image is over 3 MB. Gumamit ng mas maliit na logo.");
+                    return;
+                  }
+                  const reader = new FileReader();
+                  reader.onload = () => onChange(String(reader.result));
+                  reader.readAsDataURL(file);
+                }}
+              />
+            </label>
+          )}
+          {hint}
+        </div>
+      );
+
+    case "signature":
+      return (
+        <div>
+          <span className="mb-1.5 block text-sm text-fg">{field.label}</span>
+          <SignaturePad value={String(value ?? "")} onChange={onChange} />
+          {hint}
+        </div>
+      );
+
     case "crop":
+    case "placement":
+    case "pageGrid":
+      // The control itself is drawn on the Stage; the inspector carries its hint and reset.
       return (
         <div>
           <div className="flex items-center justify-between gap-3">
             <span className="text-sm text-fg">{field.label}</span>
-            <button type="button" onClick={onReset} className="min-h-9 rounded px-2 text-sm text-muted underline hover:text-lime">
+            <button type="button" onClick={onReset} className="min-h-9 rounded px-2 text-sm text-muted underline hover:text-accent">
               Reset
             </button>
           </div>

@@ -11,6 +11,7 @@ export const merge: Tool = {
   category: "pdf",
   description: "Combine several PDFs into one. Drag the files to set the order.",
   accepts: [PDF_MIME],
+  output: "pdf",
   seoTitle: "Merge PDF Files: combine PDFs offline in your browser",
   seoDescription:
     "Merge multiple PDF files into one document without uploading them. Drag to reorder, then download. Free, private and works offline.",

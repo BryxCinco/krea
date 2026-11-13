@@ -15,6 +15,8 @@ export interface InspectorProps {
   running: boolean;
   /** Why the Move cannot run yet, or null when it can. */
   blocked: string | null;
+  /** Non-blocking heads-up, e.g. a very large output. */
+  warning?: string | null;
   runLabel: string;
   onChange: (patch: OptionValues) => void;
   onRun: () => void;
@@ -41,7 +43,7 @@ function RunButton({ running, blocked, runLabel, onRun, onCancel, className = ""
  * Mobile: a thumb-reachable action bar pinned to the bottom, with the settings in a bottom sheet.
  */
 export function Inspector(props: InspectorProps) {
-  const { tool, values, pageCount, blocked, onChange } = props;
+  const { tool, values, pageCount, blocked, warning, onChange } = props;
   const [sheetOpen, setSheetOpen] = useState(false);
 
   useEffect(() => {
@@ -53,18 +55,22 @@ export function Inspector(props: InspectorProps) {
 
   const heading = (
     <div className="flex items-center gap-2">
-      <ToolIcon name={tool.icon} className="size-5 text-lime" />
+      <ToolIcon name={tool.icon} className="size-5 text-accent" />
       <h2 className="text-lg font-semibold text-fg">{tool.name}</h2>
     </div>
   );
   const fields = <Fields tool={tool} values={values} pageCount={pageCount} onChange={onChange} />;
-  const blockedNote = blocked && <p className="text-sm leading-relaxed text-signal">{blocked}</p>;
+  const blockedNote = (blocked || warning) && (
+    <p role="status" className="text-sm leading-relaxed text-signal">
+      {blocked ?? warning}
+    </p>
+  );
 
   return (
     <>
       {/* Desktop panel */}
       <aside aria-label={`${tool.name} settings`} className="hidden w-[340px] shrink-0 border-l border-line bg-panel lg:block">
-        <div className="sticky top-14 flex max-h-[calc(100dvh-3.5rem)] flex-col gap-5 overflow-y-auto p-5">
+        <div className="sticky top-(--header-h) flex max-h-[calc(100dvh-var(--header-h))] flex-col gap-5 overflow-y-auto p-5">
           {heading}
           <p className="-mt-3 text-sm leading-relaxed text-muted">{tool.description}</p>
           {fields}
@@ -94,7 +100,7 @@ export function Inspector(props: InspectorProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSheetOpen(false)}
-              className="absolute inset-0 bg-ink/70"
+              className="absolute inset-0 bg-scrim"
             />
             <motion.div
               role="dialog"

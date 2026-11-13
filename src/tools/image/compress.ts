@@ -31,6 +31,7 @@ export const compress: Tool = {
   category: "image",
   description: "Shrink JPG, PNG and WebP files with a quality slider or an exact target size in KB.",
   accepts: IMAGE_MIMES,
+  output: "image",
   seoTitle: "Image Compressor: compress to an exact KB size, offline",
   seoDescription:
     "Compress JPG, PNG and WebP to a target size like 200 KB right in your browser. No upload, no account. Works offline.",

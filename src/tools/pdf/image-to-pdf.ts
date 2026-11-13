@@ -19,6 +19,7 @@ export const imageToPdf: Tool = {
   category: "pdf",
   description: "Combine images into a single PDF with page size, orientation and margin options.",
   accepts: IMAGE_MIMES,
+  output: "pdf",
   seoTitle: "Image to PDF: turn JPG and PNG into one PDF, offline",
   seoDescription:
     "Convert JPG, PNG and WebP images into a single PDF in your browser. Choose A4, Letter or Legal, set margins, reorder pages. No upload.",

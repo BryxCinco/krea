@@ -97,3 +97,15 @@ export function flattenOnto(canvas: OffscreenCanvas, color: string): OffscreenCa
 export function sameFormat(mime: string): string {
   return mime === "image/jpeg" || mime === "image/webp" || mime === "image/png" ? mime : "image/png";
 }
+
+/** Turn a data URL (how picked logos and signatures are stored in settings) back into a Blob. */
+export async function dataUrlToBlob(dataUrl: string): Promise<Blob> {
+  return (await fetch(dataUrl)).blob();
+}
+
+/** Trace a rounded rectangle path, falling back to square corners on older engines. */
+export function roundedRect(ctx: Canvas2D, x: number, y: number, w: number, h: number, radius: number): void {
+  ctx.beginPath();
+  if (radius > 0 && typeof ctx.roundRect === "function") ctx.roundRect(x, y, w, h, Math.min(radius, w / 2, h / 2));
+  else ctx.rect(x, y, w, h);
+}

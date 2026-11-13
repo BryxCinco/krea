@@ -12,6 +12,7 @@ export const pdfToImage: Tool = {
   category: "pdf",
   description: "Turn PDF pages into high-resolution PNG or JPG images.",
   accepts: [PDF_MIME],
+  output: "image",
   seoTitle: "PDF to Image: convert PDF pages to PNG or JPG, offline",
   seoDescription:
     "Convert PDF pages to PNG or JPG at up to 300 DPI in your browser. Download all pages as a ZIP. No upload, no watermark.",

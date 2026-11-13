@@ -2,7 +2,7 @@
 
 import { useEffect, useEffectEvent, useRef } from "react";
 
-/** Crop rectangle, normalized to the image (all values 0..1). */
+/** A rectangle normalized to the image it sits on (all values 0..1). */
 export interface CropRect {
   x: number;
   y: number;
@@ -15,8 +15,18 @@ type Corner = "nw" | "ne" | "sw" | "se";
 const MIN = 0.04;
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
-/** Largest centred box with the given normalized aspect (width/height in 0..1 units). */
-function fitAspect(normalizedAspect: number): CropRect {
+/** A box with the given normalized aspect (width/height in 0..1 units): centred, or kept near `around`. */
+function fitAspect(normalizedAspect: number, around?: CropRect): CropRect {
+  if (around) {
+    // Keep the current width and position where possible (used when placing an image).
+    let w = around.w;
+    let h = w / normalizedAspect;
+    if (h > 1) {
+      h = 1;
+      w = h * normalizedAspect;
+    }
+    return { x: clamp(around.x, 0, 1 - w), y: clamp(around.y, 0, 1 - h), w, h };
+  }
   const w = Math.min(1, normalizedAspect);
   const h = w / normalizedAspect;
   return { x: (1 - w) / 2, y: (1 - h) / 2, w, h };
@@ -46,29 +56,38 @@ function resizeFrom(box: CropRect, corner: Corner, dx: number, dy: number, aspec
 
 interface CropBoxProps {
   src: string;
+  alt: string;
   value: CropRect;
-  /** Locked ratio in real pixels (width / height), or null for free crop. */
+  /** Locked ratio in real pixels (width / height), or null for a free box. */
   aspect: number | null;
-  /** Natural image size, needed to convert the pixel ratio into normalized units. */
+  /** Natural size of the underlying image, needed to convert the pixel ratio into normalized units. */
   imageWidth: number;
   imageHeight: number;
+  /**
+   * "crop": darken everything outside the box and show its pixel size.
+   * "place": show `overlaySrc` inside the box (a signature on a page).
+   */
+  mode?: "crop" | "place";
+  overlaySrc?: string;
+  /** Accessible name of the box. */
+  label: string;
   onChange: (rect: CropRect) => void;
 }
 
-/** Interactive crop overlay: drag the box to move it, drag a corner to resize, arrow keys to nudge. */
-export function CropBox({ src, value, aspect, imageWidth, imageHeight, onChange }: CropBoxProps) {
+/** A draggable, resizable box over an image: drag to move, drag a corner to resize, arrow keys to nudge. */
+export function CropBox({ src, alt, value, aspect, imageWidth, imageHeight, mode = "crop", overlaySrc, label, onChange }: CropBoxProps) {
   const frame = useRef<HTMLDivElement>(null);
   const normalizedAspect = aspect ? aspect / (imageWidth / imageHeight) : null;
 
   // Enforce the locked ratio: whenever the box does not match it (a new ratio was
-  // picked, or a different image arrived), snap to the largest centred box that does.
+  // picked, or a different image arrived), snap to a box that does.
   const fitsAspect = !normalizedAspect || Math.abs(value.w / value.h / normalizedAspect - 1) < 0.01;
-  const snap = useEffectEvent(() => onChange(fitAspect(normalizedAspect!)));
+  const snap = useEffectEvent(() => onChange(fitAspect(normalizedAspect!, mode === "place" ? value : undefined)));
   useEffect(() => {
     if (!fitsAspect) snap();
   }, [fitsAspect]);
 
-  const drag = (mode: Corner | "move") => (event: React.PointerEvent) => {
+  const drag = (handle: Corner | "move") => (event: React.PointerEvent) => {
     event.preventDefault();
     event.stopPropagation();
     const bounds = frame.current!.getBoundingClientRect();
@@ -80,17 +99,19 @@ export function CropBox({ src, value, aspect, imageWidth, imageHeight, onChange 
       const dx = (move.clientX - originX) / bounds.width;
       const dy = (move.clientY - originY) / bounds.height;
       onChange(
-        mode === "move"
+        handle === "move"
           ? { ...start, x: clamp(start.x + dx, 0, 1 - start.w), y: clamp(start.y + dy, 0, 1 - start.h) }
-          : resizeFrom(start, mode, dx, dy, normalizedAspect),
+          : resizeFrom(start, handle, dx, dy, normalizedAspect),
       );
     };
     const onUp = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
     };
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
   };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
@@ -115,16 +136,19 @@ export function CropBox({ src, value, aspect, imageWidth, imageHeight, onChange 
   ];
 
   return (
-    <div ref={frame} className="relative inline-block max-w-full touch-none select-none overflow-hidden rounded-md">
+    <div
+      ref={frame}
+      className={`relative inline-block max-w-full touch-none select-none rounded-md ${mode === "crop" ? "overflow-hidden" : "border border-line bg-paper"}`}
+    >
       {/* eslint-disable-next-line @next/next/no-img-element -- local blob URL */}
-      <img src={src} alt="Image being cropped" draggable={false} className="block max-h-[52vh] max-w-full" />
+      <img src={src} alt={alt} draggable={false} className="block max-h-[56vh] max-w-full" />
       <div
         role="group"
         tabIndex={0}
-        aria-label={`Crop area, ${Math.round(value.w * imageWidth)} by ${Math.round(value.h * imageHeight)} pixels. Use arrow keys to move.`}
+        aria-label={`${label}. Use arrow keys to move.`}
         onPointerDown={drag("move")}
         onKeyDown={onKeyDown}
-        className="absolute cursor-move border-2 border-lime shadow-[0_0_0_9999px_rgb(10_11_8/0.72)]"
+        className={`absolute cursor-move border-2 border-accent ${mode === "crop" ? "shadow-[0_0_0_9999px_var(--scrim)]" : "border-dashed"}`}
         style={{
           left: `${value.x * 100}%`,
           top: `${value.y * 100}%`,
@@ -132,9 +156,16 @@ export function CropBox({ src, value, aspect, imageWidth, imageHeight, onChange 
           height: `${value.h * 100}%`,
         }}
       >
-        <span className="absolute left-1 top-1 rounded bg-ink/80 px-1.5 py-0.5 font-mono text-[11px] text-lime">
-          {Math.round(value.w * imageWidth)} x {Math.round(value.h * imageHeight)}
-        </span>
+        {mode === "crop" ? (
+          <span className="absolute left-1 top-1 rounded bg-ink/80 px-1.5 py-0.5 font-mono text-[11px] text-accent">
+            {Math.round(value.w * imageWidth)} x {Math.round(value.h * imageHeight)}
+          </span>
+        ) : (
+          overlaySrc && (
+            // eslint-disable-next-line @next/next/no-img-element -- data URL
+            <img src={overlaySrc} alt="" draggable={false} className="pointer-events-none absolute inset-0 size-full object-contain" />
+          )
+        )}
         {corners.map((corner) => (
           // Oversized hit area (24px) around a small visible handle, for fingers.
           <span
@@ -143,7 +174,7 @@ export function CropBox({ src, value, aspect, imageWidth, imageHeight, onChange 
             onPointerDown={drag(corner.id)}
             className={`absolute flex size-6 items-center justify-center ${corner.className}`}
           >
-            <span className="size-3 rounded-sm bg-lime" />
+            <span className="size-3 rounded-sm bg-lime ring-1 ring-on-lime" />
           </span>
         ))}
       </div>
