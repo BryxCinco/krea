@@ -23,6 +23,7 @@ export async function runChain(
   signal?: AbortSignal,
 ): Promise<ToolResult> {
   let files = inputs;
+  let view: ToolResult["view"];
   const notes: string[] = [];
 
   for (let stepIndex = 0; stepIndex < steps.length; stepIndex++) {
@@ -54,10 +55,13 @@ export async function runChain(
     if (tool.input === "all") {
       const result = await tool.run(files, step.options, { progress: report, signal });
       files = result.files;
+      view = result.view;
       if (result.note) notes.push(result.note);
     } else {
       // Batch: one file at a time keeps peak memory at a single decoded file.
       const outputs: WorkFile[] = [];
+      const texts: string[] = [];
+      view = undefined;
       for (let i = 0; i < files.length; i++) {
         const result = await tool.run([files[i]], step.options, {
           signal,
@@ -66,11 +70,18 @@ export async function runChain(
         });
         outputs.push(...result.files);
         if (result.note && !notes.includes(result.note)) notes.push(result.note);
+        // On-screen content: text from several files is joined; otherwise the first file's view is shown.
+        if (result.view?.type === "text") {
+          texts.push(files.length > 1 ? `=== ${files[i].name} ===\n${result.view.text}` : result.view.text);
+        } else {
+          view ??= result.view;
+        }
       }
+      if (texts.length) view = { type: "text", text: texts.join("\n\n") };
       files = outputs;
     }
   }
 
   onProgress({ value: 1, label: "Done", step: steps.length - 1 });
-  return { files, note: notes.join(" ") || undefined };
+  return { files, note: notes.join(" ") || undefined, view };
 }

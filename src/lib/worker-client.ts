@@ -1,9 +1,16 @@
 /**
  * Main-thread side of the worker protocol. Workers are created lazily, one per
  * kind, and reused. Cancelling terminates the worker; the next job gets a new one.
+ *
+ * A Render Chain is executed one step at a time from here, so that each step
+ * runs where its tool lives (image worker, pdf worker, or page-coordinated) and
+ * the output of every finished step is kept if a later one fails. Consecutive
+ * steps of the same kind reuse the same worker, and files move between steps by
+ * reference, never by copy.
  */
 import type { ChainProgress } from "@/lib/chain-runner";
-import { KreaError, type ChainStep, type ToolResult, type WorkerKind, type WorkFile } from "@/tools/types";
+import { getTool } from "@/tools/registry";
+import { KreaError, type ChainStep, type ErrorCode, type ToolResult, type WorkerKind, type WorkFile } from "@/tools/types";
 import { unexpectedMessage, type FileInfo, type WorkerRequest, type WorkerResponse } from "@/workers/runtime";
 
 // The URLs must be literal so the bundler can emit each worker as its own chunk.
@@ -76,19 +83,36 @@ export class CancelledError extends Error {
   }
 }
 
+/** A step failed. Carries which one, and the files produced by the steps before it. */
+export class StepError extends Error {
+  code: ErrorCode;
+  stepIndex: number;
+  toolName: string;
+  /** Output of the last step that succeeded; undefined when the first step failed. */
+  partial?: WorkFile[];
+  constructor(cause: Error, stepIndex: number, toolName: string, partial?: WorkFile[]) {
+    super(cause.message);
+    this.name = "StepError";
+    this.code = cause instanceof KreaError ? cause.code : "failed";
+    this.stepIndex = stepIndex;
+    this.toolName = toolName;
+    this.partial = partial;
+  }
+}
+
 export interface Job {
   promise: Promise<ToolResult>;
   cancel: () => void;
 }
 
 /**
- * "pdfjs" tools: run the chain from the page (pdf.js does its heavy work in its
- * own workers). Cancelling aborts a signal the tool checks between pages.
+ * Page-coordinated tools ("pdfjs", "ocr"): run from the page, while pdf.js and
+ * Tesseract do the heavy work in their own workers. Cancelling aborts a signal.
  */
-function runOnPage(steps: ChainStep[], files: WorkFile[], onProgress: (progress: ChainProgress) => void): Job {
+function runOnPage(step: ChainStep, files: WorkFile[], onProgress: (progress: ChainProgress) => void): Job {
   const controller = new AbortController();
   const promise = import("@/lib/chain-runner")
-    .then(({ runChain }) => runChain(steps, files, onProgress, controller.signal))
+    .then(({ runChain }) => runChain([step], files, onProgress, controller.signal))
     .catch((error: unknown) => {
       if (controller.signal.aborted) throw new CancelledError();
       if (error instanceof KreaError) throw error;
@@ -98,18 +122,57 @@ function runOnPage(steps: ChainStep[], files: WorkFile[], onProgress: (progress:
   return { promise, cancel: () => controller.abort() };
 }
 
-/** Run a chain of steps (a single Move is one step) in the given worker. */
-export function runSteps(
-  kind: WorkerKind,
-  steps: ChainStep[],
-  files: WorkFile[],
-  onProgress: (progress: ChainProgress) => void,
-): Job {
-  if (kind === "pdfjs") return runOnPage(steps, files, onProgress);
-  const id = nextId++;
+/** Run one step where its tool lives. */
+function runStep(kind: WorkerKind, step: ChainStep, files: WorkFile[], onProgress: (progress: ChainProgress) => void): Job {
+  if (kind === "pdfjs" || kind === "ocr") return runOnPage(step, files, onProgress);
   return {
-    promise: send<ToolResult>(kind, { type: "run", id, steps, files }, onProgress),
+    promise: send<ToolResult>(kind, { type: "run", id: nextId++, steps: [step], files }, onProgress),
     cancel: () => stopWorker(kind, new CancelledError()),
+  };
+}
+
+/** Run a chain of steps in order. A single Move is a chain with one step. */
+export function runSteps(steps: ChainStep[], files: WorkFile[], onProgress: (progress: ChainProgress) => void): Job {
+  let cancelled = false;
+  let cancelCurrent: (() => void) | null = null;
+
+  const promise = (async (): Promise<ToolResult> => {
+    let current = files;
+    let view: ToolResult["view"];
+    const notes: string[] = [];
+
+    for (let index = 0; index < steps.length; index++) {
+      if (cancelled) throw new CancelledError();
+      const tool = getTool(steps[index].slug);
+      if (!tool) throw new StepError(new KreaError("failed", "This Move no longer exists."), index, steps[index].slug);
+
+      const job = runStep(tool.worker, steps[index], current, (progress) =>
+        onProgress({
+          value: (index + progress.value) / steps.length,
+          label: steps.length > 1 ? `Step ${index + 1} of ${steps.length}: ${progress.label}` : progress.label,
+          step: index,
+        }),
+      );
+      cancelCurrent = job.cancel;
+      try {
+        const result = await job.promise;
+        current = result.files;
+        view = result.view;
+        if (result.note) notes.push(result.note);
+      } catch (error) {
+        if (cancelled || error instanceof CancelledError) throw new CancelledError();
+        throw new StepError(error as Error, index, tool.name, index > 0 ? current : undefined);
+      }
+    }
+    return { files: current, note: notes.join(" ") || undefined, view };
+  })();
+
+  return {
+    promise,
+    cancel: () => {
+      cancelled = true;
+      cancelCurrent?.();
+    },
   };
 }
 

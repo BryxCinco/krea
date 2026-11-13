@@ -1,11 +1,13 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { CornerDownLeft, LayoutList, Search, Trash2 } from "lucide-react";
+import { CornerDownLeft, LayoutList, Link2, Monitor, Moon, Search, Sun, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ToolIcon } from "@/components/ui/icon";
 import { useSession } from "@/lib/session";
+import { applyTheme } from "@/lib/theme";
+import { OPEN_CHAINS_EVENT } from "@/components/ui/app-header";
 import { tools } from "@/tools/registry";
 
 /** Fired by the header button to open the palette. */
@@ -78,6 +80,28 @@ export function CommandPalette() {
         run: () => router.push("/tools"),
       },
       {
+        id: "chains",
+        label: "Render Chains",
+        detail: "PANEL",
+        keywords: "chain pipeline preset gov portal 2x2 email",
+        icon: <Link2 aria-hidden className="size-4" strokeWidth={1.75} />,
+        run: () => (location.pathname === "/" ? window.dispatchEvent(new Event(OPEN_CHAINS_EVENT)) : router.push("/#chains")),
+      },
+      ...(
+        [
+          ["dark", "Dark", Moon],
+          ["light", "Light", Sun],
+          ["system", "System", Monitor],
+        ] as const
+      ).map(([choice, label, Icon]) => ({
+        id: `theme-${choice}`,
+        label: `Theme: ${label}`,
+        detail: "THEME",
+        keywords: "theme mode appearance color dark light system",
+        icon: <Icon aria-hidden className="size-4" strokeWidth={1.75} />,
+        run: () => applyTheme(choice),
+      })),
+      {
         id: "wipe",
         label: "Wipe session",
         detail: "ACTION",
@@ -129,7 +153,7 @@ export function CommandPalette() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={close}
-            className="absolute inset-0 bg-ink/80"
+            className="absolute inset-0 bg-scrim"
           />
           <motion.div
             role="dialog"
@@ -172,7 +196,7 @@ export function CommandPalette() {
                   onPointerMove={() => setActive(index)}
                   onClick={() => choose(command)}
                   className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-md px-3 ${
-                    index === active ? "bg-raised text-lime" : "text-fg"
+                    index === active ? "bg-raised text-accent" : "text-fg"
                   }`}
                 >
                   {command.icon}
