@@ -1,0 +1,39 @@
+{
+  "name": "krea",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "assets": "node -e \"const fs=require('fs');for(const d of ['cmaps','standard_fonts','wasm'])fs.cpSync('node_modules/pdfjs-dist/'+d,'public/pdfjs/'+d,{recursive:true});for(const f of ['pdf.worker.min.mjs','pdf.renderer.min.mjs'])fs.cpSync('node_modules/pdfjs-dist/build/'+f,'public/pdfjs/'+f)\"",
+    "predev": "npm run assets",
+    "dev": "next dev",
+    "prebuild": "npm run assets",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@imgly/background-removal": "^1.7.0",
+    "framer-motion": "^14.14.0",
+    "jszip": "^3.10.2",
+    "lucide-react": "^1.72.0",
+    "next": "16.4.6",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.5.438",
+    "qrcode": "^1.5.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tesseract.js": "^7.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "4.3.3",
+    "@types/node": "^20",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.6",
+    "tailwindcss": "4.3.3",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,60 @@
+@import "tailwindcss";
+@import "../styles/kinetic.css";
+
+/*
+ * Kinetic Darkroom design tokens.
+ * One electric accent (lime) for actions and focus; the warm signal colour is
+ * reserved for warnings and active processing.
+ */
+@theme inline {
+  --color-ink: #0a0b08;
+  --color-panel: #11130e;
+  --color-raised: #1a1d15;
+  --color-line: #2b3023;
+  --color-fg: #eef1e6;
+  --color-muted: #a4aa96;
+  --color-lime: #c6ff3d;
+  --color-signal: #ff6b3d;
+  --font-sans: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-code), ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+html {
+  color-scheme: dark;
+  background: var(--color-ink);
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Visible keyboard focus everywhere, in the accent colour. In the base layer so a component can restyle it. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-lime);
+    outline-offset: 2px;
+  }
+}
+
+::selection {
+  background: var(--color-lime);
+  color: var(--color-ink);
+}
+
+input[type="range"] {
+  accent-color: var(--color-lime);
+}
+
+button,
+[role="button"],
+select,
+summary {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}

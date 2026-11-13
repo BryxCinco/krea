@@ -1,0 +1,92 @@
+/* Motion primitives for the Kinetic Darkroom look. All of it switches off under prefers-reduced-motion. */
+
+/* Render line: a thin bar that fills with progress while a highlight sweeps across it. */
+.render-line {
+  position: relative;
+  height: 2px;
+  overflow: hidden;
+  background: var(--color-line);
+}
+
+.render-line__fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: left;
+  background: var(--color-signal);
+  transition: transform 200ms ease-out;
+}
+
+.render-line__sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, #fff 50%, transparent);
+  opacity: 0.7;
+  animation: render-sweep 1.1s linear infinite;
+}
+
+@keyframes render-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Dropzone: the frame breathes on hover and while a file is dragged over it. */
+.dropzone-frame {
+  transition:
+    border-color 200ms,
+    background-color 200ms;
+}
+
+.dropzone-frame:hover,
+.dropzone-frame[data-dragging="true"] {
+  animation: dropzone-pulse 1.6s ease-in-out infinite;
+  border-color: var(--color-lime);
+}
+
+@keyframes dropzone-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(198 255 61 / 0.28);
+  }
+  50% {
+    box-shadow: 0 0 0 14px rgb(198 255 61 / 0);
+  }
+}
+
+/* Headline letters are moved by script (see components/ui/kinetic-title.tsx). */
+.kinetic-letter {
+  display: inline-block;
+  transition:
+    transform 180ms ease-out,
+    color 180ms ease-out,
+    font-variation-settings 180ms ease-out;
+  will-change: transform;
+}
+
+/* Checkerboard behind transparent images so cut-outs are visible. */
+.checkerboard {
+  background-color: #1d2018;
+  background-image:
+    linear-gradient(45deg, #2a2e22 25%, transparent 25%, transparent 75%, #2a2e22 75%),
+    linear-gradient(45deg, #2a2e22 25%, transparent 25%, transparent 75%, #2a2e22 75%);
+  background-size: 16px 16px;
+  background-position:
+    0 0,
+    8px 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .render-line__sweep,
+  .dropzone-frame:hover,
+  .dropzone-frame[data-dragging="true"] {
+    animation: none;
+  }
+
+  .kinetic-letter,
+  .render-line__fill {
+    transition: none;
+  }
+}
