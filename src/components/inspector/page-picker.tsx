@@ -76,7 +76,7 @@ export function PagePicker({ id, value, pageCount, hintId, onChange }: PagePicke
               aria-label={`Page ${page}`}
               onClick={() => toggle(page)}
               className={`min-h-9 rounded border font-mono text-xs transition-colors ${
-                selected.has(page) ? "border-lime bg-lime text-ink" : "border-line text-muted hover:border-lime hover:text-fg"
+                selected.has(page) ? "border-accent bg-lime text-on-lime" : "border-line text-muted hover:border-accent hover:text-fg"
               }`}
             >
               {page}

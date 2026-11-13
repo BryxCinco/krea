@@ -79,7 +79,7 @@ function Row({ file, index }: { file: StageFile; index: number }) {
             aria-label={`Move ${file.name} up`}
             disabled={index === 0}
             onClick={() => move(-1)}
-            className="flex size-9 items-center justify-center rounded text-muted hover:text-lime disabled:opacity-30"
+            className="flex size-9 items-center justify-center rounded text-muted hover:text-accent disabled:opacity-30"
           >
             <ArrowUp aria-hidden className="size-4" strokeWidth={1.75} />
           </button>
@@ -88,7 +88,7 @@ function Row({ file, index }: { file: StageFile; index: number }) {
             aria-label={`Move ${file.name} down`}
             disabled={index === files.length - 1}
             onClick={() => move(1)}
-            className="flex size-9 items-center justify-center rounded text-muted hover:text-lime disabled:opacity-30"
+            className="flex size-9 items-center justify-center rounded text-muted hover:text-accent disabled:opacity-30"
           >
             <ArrowDown aria-hidden className="size-4" strokeWidth={1.75} />
           </button>

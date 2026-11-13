@@ -38,7 +38,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
         <ol className="mt-4 flex max-w-2xl flex-col gap-3">
           {tool.howTo.map((step, index) => (
             <li key={step} className="flex gap-4 leading-relaxed text-fg">
-              <span className="font-mono text-lime">{String(index + 1).padStart(2, "0")}</span>
+              <span className="font-mono text-accent">{String(index + 1).padStart(2, "0")}</span>
               {step}
             </li>
           ))}

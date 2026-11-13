@@ -29,13 +29,13 @@ export function Moves({
             transition={{ type: "spring", stiffness: 420, damping: 24, delay: index * 0.045 }}
             whileTap={{ scale: 0.95 }}
             className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm transition-colors ${
-              active ? "border-lime bg-lime font-semibold text-ink" : "border-line bg-panel text-fg hover:border-lime"
+              active ? "border-accent bg-lime font-semibold text-on-lime" : "border-line bg-panel text-fg hover:border-accent"
             }`}
           >
             <ToolIcon name={tool.icon} />
             {tool.verb}
             {batch && tool.input === "each" && (
-              <span className={`font-mono text-[11px] ${active ? "text-ink/70" : "text-muted"}`}>batch</span>
+              <span className={`font-mono text-[11px] ${active ? "text-on-lime/70" : "text-muted"}`}>batch</span>
             )}
           </motion.button>
         );

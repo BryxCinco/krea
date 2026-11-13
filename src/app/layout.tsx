@@ -5,6 +5,7 @@ import { AppHeader } from "@/components/ui/app-header";
 import { MotionProvider } from "@/components/ui/motion-provider";
 import { ServiceWorker } from "@/components/ui/service-worker";
 import { SessionProvider } from "@/lib/session";
+import { themeScript } from "@/lib/theme";
 import "./globals.css";
 
 // Fonts are downloaded at build time and self-hosted, so no request leaves the device at runtime.
@@ -17,15 +18,15 @@ export const metadata: Metadata = {
     template: "%s | Krea",
   },
   description:
-    "Krea is a local-first file toolkit. Compress, resize and convert images, merge and split PDFs, make ID photos. Everything runs in your browser, nothing is uploaded.",
+    "Krea is a local-first file toolkit. Compress, resize and convert images, merge, sign and protect PDFs, run OCR. Everything runs in your browser, nothing is uploaded.",
   applicationName: "Krea",
   appleWebApp: { capable: true, title: "Krea", statusBarStyle: "black-translucent" },
   icons: { icon: "/icons/icon.svg", apple: "/icons/icon-192.png" },
 };
 
 export const viewport: Viewport = {
+  // Default (dark) chrome colour; lib/theme.ts updates it when the theme changes.
   themeColor: "#0a0b08",
-  colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -33,11 +34,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${display.variable} ${code.variable} antialiased`}>
+    // data-theme is corrected by the inline script before first paint, hence suppressHydrationWarning.
+    <html lang="en" data-theme="dark" suppressHydrationWarning className={`${display.variable} ${code.variable} antialiased`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-dvh">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[80] focus:rounded-md focus:bg-lime focus:px-4 focus:py-2 focus:text-ink"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-80 focus:rounded-md focus:bg-lime focus:px-4 focus:py-2 focus:text-on-lime"
         >
           Skip to content
         </a>

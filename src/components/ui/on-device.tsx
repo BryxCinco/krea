@@ -4,8 +4,8 @@ import { ShieldCheck } from "lucide-react";
 import { useId, useState } from "react";
 
 /**
- * Persistent privacy indicator. The explanation opens on hover, focus and tap,
- * so it is reachable by mouse, keyboard and touch.
+ * Persistent privacy indicator, shown as a compact pill. The explanation opens
+ * on hover, focus and tap, so it is reachable by mouse, keyboard and touch.
  */
 export function OnDeviceIndicator() {
   const [open, setOpen] = useState(false);
@@ -20,13 +20,10 @@ export function OnDeviceIndicator() {
         onClick={() => setOpen((value) => !value)}
         onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
-        className="inline-flex min-h-10 items-center gap-2 rounded-md px-2 font-mono text-xs text-lime"
+        className="inline-flex min-h-10 items-center gap-2 rounded-full border border-accent/50 px-3 font-mono text-xs text-accent"
       >
         <ShieldCheck aria-hidden className="size-4" strokeWidth={1.75} />
-        <span>
-          100% <span className="hidden sm:inline">on-device</span>
-          <span className="sm:hidden">local</span>
-        </span>
+        100% on-device
       </button>
       <div
         id={id}

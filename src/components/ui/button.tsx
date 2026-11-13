@@ -3,10 +3,10 @@ import type { ButtonHTMLAttributes } from "react";
 type Variant = "primary" | "ghost" | "outline" | "signal";
 
 const styles: Record<Variant, string> = {
-  primary: "bg-lime text-ink font-semibold hover:brightness-110 disabled:bg-line disabled:text-muted",
-  outline: "border border-line text-fg hover:border-lime hover:text-lime disabled:text-muted disabled:hover:border-line",
+  primary: "bg-lime text-on-lime font-semibold hover:brightness-110 disabled:bg-line disabled:text-muted",
+  outline: "border border-line text-fg hover:border-accent hover:text-accent disabled:text-muted disabled:hover:border-line",
   ghost: "text-muted hover:text-fg hover:bg-raised",
-  signal: "border border-signal text-signal font-semibold hover:bg-signal hover:text-ink",
+  signal: "border border-signal text-signal font-semibold hover:bg-signal hover:text-on-signal",
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

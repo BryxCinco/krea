@@ -3,30 +3,87 @@
 
 /*
  * Kinetic Darkroom design tokens.
- * One electric accent (lime) for actions and focus; the warm signal colour is
- * reserved for warnings and active processing.
+ *
+ * Every colour in the app comes from these variables; components never hard-code
+ * a colour. The theme is chosen by `data-theme` on <html>, set before first paint
+ * by the inline script in app/layout.tsx.
+ *
+ * Accent roles:
+ *   lime      bright fill (buttons, active chips). Always paired with `on-lime` text.
+ *   accent    accent for text, borders and focus rings. Bright lime on dark, deep
+ *             olive on light, because bright lime is unreadable on a light surface.
+ *   signal    warnings and active processing only.
  */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #0a0b08;
+  --panel: #11130e;
+  --raised: #1a1d15;
+  --line: #2b3023;
+  --fg: #eef1e6;
+  --muted: #a4aa96;
+  --lime: #c6ff3d;
+  --on-lime: #0a0b08;
+  --accent: #c6ff3d;
+  --signal: #ff6b3d;
+  --on-signal: #0a0b08;
+  --scrim: rgb(0 0 0 / 0.72);
+  --checker: #2a2e22;
+  /* Paper stays white in both themes: signatures and page previews are documents, not UI. */
+  --paper: #ffffff;
+  --header-h: 4rem;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --ink: #f5f2e9;
+  --panel: #fcfaf4;
+  --raised: #ebe7da;
+  --line: #cdc7b5;
+  --fg: #14150f;
+  --muted: #595c4d;
+  --lime: #c6ff3d;
+  --on-lime: #0a0b08;
+  --accent: #47630a;
+  --signal: #b93a0e;
+  --on-signal: #ffffff;
+  --scrim: rgb(20 21 15 / 0.55);
+  --checker: #d9d4c4;
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --header-h: 5rem;
+  }
+}
+
 @theme inline {
-  --color-ink: #0a0b08;
-  --color-panel: #11130e;
-  --color-raised: #1a1d15;
-  --color-line: #2b3023;
-  --color-fg: #eef1e6;
-  --color-muted: #a4aa96;
-  --color-lime: #c6ff3d;
-  --color-signal: #ff6b3d;
+  --color-ink: var(--ink);
+  --color-panel: var(--panel);
+  --color-raised: var(--raised);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-lime: var(--lime);
+  --color-on-lime: var(--on-lime);
+  --color-accent: var(--accent);
+  --color-signal: var(--signal);
+  --color-on-signal: var(--on-signal);
+  --color-scrim: var(--scrim);
+  --color-paper: var(--paper);
   --font-sans: var(--font-display), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-code), ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 
 html {
-  color-scheme: dark;
-  background: var(--color-ink);
+  background: var(--ink);
+  scroll-padding-top: calc(var(--header-h) + 1rem);
 }
 
 body {
-  background: var(--color-ink);
-  color: var(--color-fg);
+  background: var(--ink);
+  color: var(--fg);
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
 }
@@ -34,18 +91,18 @@ body {
 /* Visible keyboard focus everywhere, in the accent colour. In the base layer so a component can restyle it. */
 @layer base {
   :focus-visible {
-    outline: 2px solid var(--color-lime);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
 }
 
 ::selection {
-  background: var(--color-lime);
-  color: var(--color-ink);
+  background: var(--lime);
+  color: var(--on-lime);
 }
 
 input[type="range"] {
-  accent-color: var(--color-lime);
+  accent-color: var(--accent);
 }
 
 button,

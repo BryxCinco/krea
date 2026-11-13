@@ -32,7 +32,7 @@ export function KineticTitle({ text, className = "" }: { text: string; className
           }
           letter.style.transform = pull ? `translateY(${-10 * pull}px) scale(${1 + 0.12 * pull})` : "";
           letter.style.fontVariationSettings = `"wght" ${Math.round(600 + 200 * pull)}`;
-          letter.style.color = pull > 0.45 ? "var(--color-lime)" : "";
+          letter.style.color = pull > 0.45 ? "var(--accent)" : "";
         }
       });
     };

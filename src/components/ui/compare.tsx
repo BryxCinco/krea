@@ -32,7 +32,7 @@ export function Compare({ before, after, beforeLabel, afterLabel }: CompareProps
       <span className="pointer-events-none absolute left-2 top-2 rounded bg-ink/80 px-2 py-1 font-mono text-xs text-fg">
         {beforeLabel}
       </span>
-      <span className="pointer-events-none absolute right-2 top-2 rounded bg-ink/80 px-2 py-1 font-mono text-xs text-lime">
+      <span className="pointer-events-none absolute right-2 top-2 rounded bg-ink/80 px-2 py-1 font-mono text-xs text-accent">
         {afterLabel}
       </span>
       <input
