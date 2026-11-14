@@ -44,3 +44,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# build-time downloads (background-removal model mirror)
+/.cache/
+/public/offline-manifest.json

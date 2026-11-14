@@ -1,16 +1,21 @@
 /*
  * Krea service worker: makes the app work offline after the first load.
  *
- * It only ever caches GET responses for the app's own code and the public
- * model files tools download. User files never pass through here: they are
- * read from memory in the page and are not part of any request.
+ * It only ever caches GET responses for the app's own code and the engine
+ * files it serves (pdf.js, qpdf, Tesseract, the background-removal model).
+ * User files never pass through here: they are read from memory in the page
+ * and are never part of any request. Krea makes no third-party requests.
  */
-const VERSION = "krea-v2";
-const SHELL = `${VERSION}-shell`; // pages and build assets
-const MODELS = `${VERSION}-models`; // third-party model downloads (background removal)
-
-/** Hosts that serve public, versioned model files to the on-device tools. */
-const MODEL_HOSTS = ["staticimgly.com"];
+const VERSION = "krea-v3";
+/** Pages and build assets. Replaced on every deploy that bumps VERSION. */
+const SHELL = `${VERSION}-shell`;
+/**
+ * Engine files (pdf.js, qpdf, Tesseract, the model). Large and only changed
+ * when a dependency is upgraded, so this cache survives deploys. Bump VENDOR
+ * when one of those dependencies changes.
+ */
+const VENDOR = "krea-vendor-1";
+const VENDOR_PREFIXES = ["/pdfjs/", "/vendor/", "/tesseract/"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -25,14 +30,14 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((key) => !key.startsWith(VERSION)).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys.filter((key) => !key.startsWith(VERSION) && key !== VENDOR).map((key) => caches.delete(key))))
       .then(() => self.clients.claim()),
   );
 });
 
 async function cacheFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
-  const hit = await cache.match(request);
+  const hit = await cache.match(request, { ignoreSearch: false });
   if (hit) {
     // Worker scripts read their bootstrap config from their own URL fragment.
     // A cached response carries the URL it was stored under (no fragment), so
@@ -61,16 +66,14 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
   const url = new URL(request.url);
-
-  if (MODEL_HOSTS.includes(url.hostname)) {
-    event.respondWith(cacheFirst(request, MODELS));
-    return;
-  }
   if (url.origin !== self.location.origin) return;
 
-  // Build assets are content-hashed, and vendored engines (pdf.js, qpdf, Tesseract)
-  // only change with a new deploy, which bumps VERSION. A cached copy is correct.
-  if (["/_next/static/", "/pdfjs/", "/vendor/", "/tesseract/"].some((prefix) => url.pathname.startsWith(prefix))) {
+  if (VENDOR_PREFIXES.some((prefix) => url.pathname.startsWith(prefix))) {
+    event.respondWith(cacheFirst(request, VENDOR));
+    return;
+  }
+  // Build assets are content-hashed, so a cached copy is always correct.
+  if (url.pathname.startsWith("/_next/static/")) {
     event.respondWith(cacheFirst(request, SHELL));
     return;
   }
@@ -79,39 +82,79 @@ self.addEventListener("fetch", (event) => {
 });
 
 /**
- * "warm": fetch each page and the scripts and styles it references, so tools
- * the user has not opened yet still load offline.
+ * Cache one URL, then follow every build asset it mentions. Pages name their
+ * scripts and styles; scripts name the lazy chunks (tool libraries, workers)
+ * they load later. Following both reaches the whole app.
  */
-self.addEventListener("message", (event) => {
-  if (event.data?.type !== "warm") return;
-  event.waitUntil(
-    (async () => {
-      const cache = await caches.open(SHELL);
-      const seen = new Set();
+async function warm(urls) {
+  const cache = await caches.open(SHELL);
+  const seen = new Set();
+  const crawl = async (url) => {
+    if (seen.has(url)) return;
+    seen.add(url);
+    try {
+      const vendor = VENDOR_PREFIXES.some((prefix) => url.startsWith(prefix));
+      const target = vendor ? await caches.open(VENDOR) : cache;
+      let response = await target.match(url);
+      if (!response) {
+        response = await fetch(url);
+        if (!response.ok) return;
+        await target.put(url, response.clone());
+      }
+      if (!/\.js$|\.mjs$|^\/[^.]*$/.test(url) || vendor) return; // only pages and our scripts reference other assets
+      const text = await response.text();
+      const found = [...text.matchAll(/static\/(?:chunks|media)\/[\w\-.~/[\]@]+\.(?:js|css|woff2)/g)];
+      await Promise.all(found.map((match) => crawl(`/_next/${match[0]}`)));
+    } catch {
+      // Offline or interrupted: warming is best-effort and retried on the next visit.
+    }
+  };
+  for (const url of urls) await crawl(url);
+}
 
-      // Cache one URL, then follow every build asset it mentions. Pages name
-      // their scripts and styles; scripts name the lazy chunks (tool libraries,
-      // workers) they load later. Following both reaches the whole app.
-      const crawl = async (url) => {
-        if (seen.has(url)) return;
-        seen.add(url);
+/**
+ * "Make offline-ready": download every heavy engine file listed in
+ * /offline-manifest.json into the vendor cache, reporting progress on the
+ * MessagePort the page sent along.
+ */
+async function makeOfflineReady(port, pages) {
+  const post = (message) => port?.postMessage(message);
+  try {
+    const manifest = await (await fetch("/offline-manifest.json", { cache: "no-store" })).json();
+    const files = manifest.files;
+    const total = files.reduce((sum, file) => sum + file.size, 0);
+    const cache = await caches.open(VENDOR);
+    let done = 0;
+    const failed = [];
+
+    // A few downloads at a time: fast, without flooding a slow connection.
+    let next = 0;
+    const lane = async () => {
+      while (next < files.length) {
+        const file = files[next++];
         try {
-          let response = await cache.match(url);
-          if (!response) {
-            response = await fetch(url);
-            if (!response.ok) return;
-            await cache.put(url, response.clone());
+          if (!(await cache.match(file.url))) {
+            const response = await fetch(file.url, { cache: "no-cache" });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            await cache.put(file.url, response);
           }
-          if (!/\.js$|\.mjs$|^\/[^.]*$/.test(url)) return; // only pages and scripts reference other assets
-          const text = await response.text();
-          const found = [...text.matchAll(/static\/(?:chunks|media)\/[\w\-.~/[\]@]+\.(?:js|css|woff2)/g)];
-          await Promise.all(found.map((match) => crawl(`/_next/${match[0]}`)));
         } catch {
-          // Offline or interrupted: warming is best-effort and retried on the next visit.
+          failed.push(file.url);
         }
-      };
+        done += file.size;
+        post({ type: "progress", done, total, group: file.group });
+      }
+    };
+    await Promise.all([lane(), lane(), lane(), lane()]);
+    await warm(pages);
 
-      for (const url of event.data.urls) await crawl(url);
-    })(),
-  );
+    post(failed.length ? { type: "error", failed, total } : { type: "done", total, count: files.length });
+  } catch (error) {
+    post({ type: "error", failed: [], message: String(error?.message ?? error) });
+  }
+}
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "warm") event.waitUntil(warm(event.data.urls));
+  if (event.data?.type === "offline-ready") event.waitUntil(makeOfflineReady(event.ports[0], event.data.pages ?? []));
 });
