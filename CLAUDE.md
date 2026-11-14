@@ -8,19 +8,24 @@ Local-first, privacy-first file toolkit. Everything runs in the browser: no back
 
 - `npm run dev` / `npm run build` / `npm run start`
 - `npm run lint`, `npm run typecheck`
-- `npm run assets` (`copy-assets.mjs`) copies pdf.js, qpdf and Tesseract runtime files into `public/pdfjs`, `public/vendor`, `public/tesseract` (runs before dev and build; git-ignored). Nothing loads from a CDN except the background-removal model.
+- `npm run assets` (`copy-assets.mjs`) copies pdf.js, qpdf and Tesseract files into `public/`, mirrors the background-removal model into `public/vendor/imgly` (downloaded once at build, SHA-256 verified, cached in `.cache/`) and writes `public/offline-manifest.json`. Runs before dev and build; all git-ignored. Krea makes no third-party requests at runtime; keep it that way.
+- `NEXT_PUBLIC_SITE_URL` sets the canonical domain (`src/lib/site.ts`).
 
 ## Architecture rules
 
 - **Hybrid layout (since Milestone 2).** Home is hero + the Stage on top, then the tool card grid. The Stage stays file-first: dropping files shows Moves, and cards for compatible tools light up while the rest dim.
 - **One tool = one file + one registry line.** Tools live in `src/tools/{image,pdf,text}/`, are registered in `src/tools/registry.ts`, and describe their settings as `fields` (see `src/tools/types.ts`). The inspector renders fields generically; tools ship no UI of their own.
 - **Tools run in workers.** `run()` executes inside `src/workers/*` via `src/lib/chain-runner.ts`. Heavy libraries are `await import()`ed inside `run()`, never at module top level, because the registry is also imported on the main thread.
+- **Editor tools (Text & Docs)** use `editorTool()` (`kind: "editor"`): metadata and pure logic in `src/tools/text/`, UI in `src/components/stage/editors/` mapped in `editor-host.tsx`. Generated documents escape every value (`esc()` in `doc-utils.ts`); Markdown is sanitized with DOMPurify. Never persist passwords, salary, Wi-Fi or account data.
+- **No OffscreenCanvas** (old iOS): `worker-client.ts` runs image/pdf steps on the page with `src/lib/offscreen-shim.ts`.
 - **Exceptions: pdf.js rendering and OCR** (`worker: "pdfjs"` / `"ocr"`, `src/lib/pdf-render.ts`, `src/lib/ocr.ts`): pdf.js needs the DOM and Tesseract ships its own worker, so these are coordinated from the page while the libraries' own workers do the work. Such tools must check `ctx.signal` to support cancel.
 - **Render Chains** run step by step via `runSteps` in `src/lib/worker-client.ts`, each step where its tool lives. Every tool declares `output` so `src/lib/chains.ts` can block incompatible steps; tools that need hands-on input set `notChainable`. Fields with `secret: true` are never saved to localStorage.
 - **Fields drawn on the Stage**: `crop`, `placement` and `pageGrid` render on the Stage (crop box, signature placement, page thumbnails), not in the inspector.
+- **Every tool needs 3-5 `faqs`**; tool pages render them with JSON-LD. Set canonical URLs per page, never in the layout.
+- **Dialogs and sheets** use `useFocusTrap`; tablists use `onTabListKeyDown`. Keep axe clean (tests ran with zero violations).
 - **Errors** thrown from tools should be `KreaError` with a code and a clear, specific message.
 - **Next.js 16 with Cache Components.** Route segment configs like `dynamicParams` are not allowed. Read `node_modules/next/dist/docs/` before using a Next API.
-- **Service worker** is hand-written in `public/sw.js` and only registers in production builds. Bump `VERSION` when cached vendor files change.
+- **Service worker** is hand-written in `public/sw.js` and only registers in production builds. Bump `VERSION` for app-shell changes and `VENDOR` when engine files change (the vendor cache survives deploys).
 - **qpdf-wasm** has a Node-only branch; `fs`/`path`/`crypto` are aliased to `src/lib/empty-module.ts` for browser bundles in `next.config.ts`.
 
 ## Design: "Kinetic Darkroom"
@@ -40,4 +45,4 @@ Local-first, privacy-first file toolkit. Everything runs in the browser: no back
 
 1. Done: scaffold, design system, Stage, palette, registry, workers, PWA, tools 1-6, 11, 12, 14, 15.
 2. Done: layout revamp (header, card grid, themes), tools 7-10, 13, 16-20, Render Chains and presets.
-3. Next: tools 21-25, SEO pages, All Tools polish, README, performance and accessibility pass.
+3. Done: tools 21-25, self-hosted model, Make offline-ready, HEIC, collage swap, SEO pages, privacy/about/how-it-works, accessibility and performance pass. See LAUNCH-CHECKLIST.md.
