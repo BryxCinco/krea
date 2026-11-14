@@ -6,6 +6,7 @@ import { useSession } from "@/lib/session";
 import { categories, movesFor, tools } from "@/tools/registry";
 import type { ToolCategory } from "@/tools/types";
 import { ToolCard, type CardFit } from "./tool-card";
+import { onTabListKeyDown } from "@/lib/use-focus-trap";
 
 type Tab = "all" | ToolCategory;
 
@@ -46,14 +47,14 @@ export function ToolBrowser() {
   return (
     <div>
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div role="tablist" aria-label="Tool categories" className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 lg:mx-0 lg:px-0">
+        <div role="tablist" onKeyDown={onTabListKeyDown} aria-label="Tool categories" className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 lg:mx-0 lg:px-0">
           {tabs.map((entry) => (
             <button
               key={entry.id}
               type="button"
               role="tab"
               aria-selected={tab === entry.id}
-              aria-controls="tool-grid"
+              aria-controls="tool-grid-panel"
               onClick={() => setTab(entry.id)}
               className={`flex min-h-10 shrink-0 items-center gap-2 rounded-full border px-4 text-sm transition-colors ${
                 tab === entry.id ? "border-accent bg-lime font-semibold text-on-lime" : "border-line text-fg hover:border-accent"
@@ -88,7 +89,8 @@ export function ToolBrowser() {
       )}
 
       {/* Re-keyed on the filter so the staggered entry replays when the set changes. */}
-      <ul id="tool-grid" role="tabpanel" key={`${tab}|${words.join(" ")}`} className="mt-5 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+      <div id="tool-grid-panel" role="tabpanel" aria-label="Tools">
+      <ul id="tool-grid" key={`${tab}|${words.join(" ")}`} className="mt-5 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
         {visible.map((tool, index) => {
           let fit: CardFit = "neutral";
           if (files.length > 0) fit = compatible.has(tool.slug) ? "match" : "dim";
@@ -109,15 +111,8 @@ export function ToolBrowser() {
           );
         })}
       </ul>
-      {visible.length === 0 &&
-        (tab === "text" && words.length === 0 ? (
-          <p className="py-10 text-center leading-relaxed text-muted">
-            Darating pa sa susunod na update: Markdown Editor, Resume Builder, Invoice Generator, QR Code Generator and the
-            PH Take-Home Pay Calculator.
-          </p>
-        ) : (
-          <p className="py-10 text-center text-muted">Walang nahanap for &quot;{query}&quot;. Try another word.</p>
-        ))}
+      </div>
+      {visible.length === 0 && <p className="py-10 text-center text-muted">Walang nahanap for &quot;{query}&quot;. Try another word.</p>}
     </div>
   );
 }

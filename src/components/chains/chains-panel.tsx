@@ -180,7 +180,8 @@ function ChainEditor({ draft, startKind, runBlock, running, onChange, onSave, on
   // What the next step will receive, and which Moves fit it.
   const incoming = chainOutput(draft.steps, startKind);
   const last = draft.steps.length ? getTool(draft.steps[draft.steps.length - 1].slug) : undefined;
-  const candidates = tools.map((tool) => ({ tool, reason: blockReason(tool, incoming, last) }));
+  // Editors (Markdown, resume, ...) are not file Moves, so they are not offered at all.
+  const candidates = tools.filter((tool) => tool.kind !== "editor").map((tool) => ({ tool, reason: blockReason(tool, incoming, last) }));
   const available = candidates.filter((entry) => !entry.reason);
   const unavailable = candidates.filter((entry) => entry.reason);
 

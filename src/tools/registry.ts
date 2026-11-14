@@ -25,6 +25,11 @@ import { protectPdf } from "./pdf/protect-pdf";
 import { signPdf } from "./pdf/sign-pdf";
 import { split } from "./pdf/split";
 import { watermarkPdf } from "./pdf/watermark-pdf";
+import { invoice } from "./text/invoice";
+import { markdown } from "./text/markdown";
+import { payroll } from "./text/payroll";
+import { qr } from "./text/qr";
+import { resume } from "./text/resume";
 import type { Move, Tool, ToolCategory } from "./types";
 
 export const tools: Tool[] = [
@@ -50,6 +55,12 @@ export const tools: Tool[] = [
   protectPdf,
   organizePdf,
   ocr,
+  // Text & Docs (21-25): editors with their own UI
+  markdown,
+  resume,
+  invoice,
+  qr,
+  payroll,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
@@ -60,6 +71,20 @@ export const categories: { id: ToolCategory; label: string }[] = [
 
 export function getTool(slug: string): Tool | undefined {
   return tools.find((tool) => tool.slug === slug);
+}
+
+/**
+ * Related tools for a tool page: tools that accept the same kind of input or
+ * share the category, excluding the tool itself. Stable order (registry order).
+ */
+export function relatedTools(tool: Tool, limit = 4): Tool[] {
+  const sameInput = (other: Tool) => other.accepts.some((mime) => tool.accepts.includes(mime));
+  const ranked = tools
+    .filter((other) => other.slug !== tool.slug)
+    .map((other) => ({ other, score: (other.category === tool.category ? 2 : 0) + (sameInput(other) ? 1 : 0) }))
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score);
+  return ranked.slice(0, limit).map((entry) => entry.other);
 }
 
 /**

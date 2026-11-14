@@ -1,10 +1,13 @@
 /** Maps the registry's string icon keys to lucide line icons, so workers never import React. */
 import {
+  Calculator,
   Combine,
   Crop,
   Eraser,
   FileArchive,
   FileImage,
+  FilePen,
+  FileUser,
   FileOutput,
   IdCard,
   LayoutDashboard,
@@ -12,6 +15,8 @@ import {
   LockKeyhole,
   Maximize2,
   Palette,
+  QrCode,
+  ReceiptText,
   Repeat2,
   Scaling,
   ScanText,
@@ -45,6 +50,11 @@ const icons: Record<IconKey, LucideIcon> = {
   lock: LockKeyhole,
   organize: LayoutGrid,
   ocr: ScanText,
+  markdown: FilePen,
+  resume: FileUser,
+  invoice: ReceiptText,
+  qr: QrCode,
+  payroll: Calculator,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

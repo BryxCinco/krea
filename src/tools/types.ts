@@ -129,7 +129,12 @@ export type IconKey =
   | "sign"
   | "lock"
   | "organize"
-  | "ocr";
+  | "ocr"
+  | "markdown"
+  | "resume"
+  | "invoice"
+  | "qr"
+  | "payroll";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
@@ -142,9 +147,23 @@ export interface InputFacts {
   bytes: number;
 }
 
+/** A question and answer shown on the tool page (and in its FAQ structured data). */
+export interface Faq {
+  q: string;
+  a: string;
+}
+
 export interface Tool {
   /** Stable number from the product spec (1-25). */
   id: number;
+  /**
+   * "file" (default): transforms files on the Stage, runs in a worker.
+   * "editor": a self-contained editor (Markdown, resume, invoice, QR, payroll)
+   * whose UI lives in src/components/stage/editors; it has no run() of its own.
+   */
+  kind?: "file" | "editor";
+  /** 3 to 5 questions people actually ask about this job. */
+  faqs: Faq[];
   slug: string;
   name: string;
   /** Short action label used on Move chips, e.g. "Compress". */
