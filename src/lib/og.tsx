@@ -4,6 +4,24 @@
  * not a themed screen.
  */
 import { ImageResponse } from "next/og";
+import { K_HEIGHT, K_PIXELS, K_WIDTH, SPARKLES } from "@/lib/logo";
+
+function LogoTile({ size }: { size: number }) {
+  const cell = size / 17;
+  const w = (K_WIDTH + 0.5) * cell, h = (K_HEIGHT + 0.5) * cell;
+  const ox = (size - w) / 2, oy = (size - h) / 2;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <rect width={size} height={size} rx={size * 0.22} fill="#c6ff3d" />
+      {K_PIXELS.map(([c, r]) => (
+        <rect key={`${c}-${r}`} x={ox + c * cell} y={oy + r * cell} width={cell} height={cell} fill="#0a0b08" />
+      ))}
+      {SPARKLES.map(([x, y, sw, o], i) => (
+        <rect key={i} x={ox + (x * cell) / 2} y={oy + (y * cell) / 2} width={(sw * cell) / 2} height={cell / 2} fill="#ffffff" opacity={o} />
+      ))}
+    </svg>
+  );
+}
 
 export const OG_SIZE = { width: 1200, height: 630 };
 
@@ -12,10 +30,10 @@ export function ogImage({ eyebrow, title, subtitle }: { eyebrow: string; title: 
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#0a0b08", color: "#eef1e6", padding: "64px 72px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <div style={{ width: 72, height: 72, borderRadius: 16, background: "#c6ff3d", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48, fontWeight: 800, color: "#0a0b08" }}>K</div>
+          <LogoTile size={72} />
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ fontSize: 40, fontWeight: 800 }}>krea</div>
-            <div style={{ fontSize: 18, letterSpacing: 4, color: "#a4aa96" }}>KINETIC RENDER ENGINE</div>
+            <div style={{ fontSize: 18, letterSpacing: 4, color: "#a4aa96" }}>KINETIC RENDER ENGINE APP</div>
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>

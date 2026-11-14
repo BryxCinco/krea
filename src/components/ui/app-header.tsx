@@ -11,27 +11,24 @@ import { useSession } from "@/lib/session";
 import { OfflineReady } from "./offline-ready";
 import { OnDeviceIndicator } from "./on-device";
 import { ThemeToggle } from "./theme-toggle";
+import { K_HEIGHT, K_PIXELS, K_WIDTH, SPARKLES } from "@/lib/logo";
 
 /** Fired to open the Chains panel on the Stage. */
 export const OPEN_CHAINS_EVENT = "krea:open-chains";
 
-/** Krea mark: the pixel-art K on a lime tile (same grid as /icons/icon.svg). */
-const K_PIXELS: [number, number][] = [];
-for (let r = 0; r < 13; r++) {
-  for (let c = 0; c < 11; c++) {
-    const up = r <= 6 && c >= 8 - r && c < 11 - r && c >= 2;
-    const down = r >= 6 && c >= r - 4 && c < r - 1;
-    if (c < 3 || up || down) K_PIXELS.push([c, r]);
-  }
-}
-
+/** Krea mark: the pixel-art K with sparkles on a lime tile (same geometry as /icons/icon.svg). */
 function LogoMark() {
+  const cell = 2.3;
+  const w = (K_WIDTH + 0.5) * cell, h = (K_HEIGHT + 0.5) * cell;
   return (
     <svg aria-hidden viewBox="0 0 40 40" shapeRendering="crispEdges" className="size-9 shrink-0 lg:size-10">
       <rect width="40" height="40" rx="9" className="fill-lime" />
-      <g transform="translate(6.5 5.5) scale(2.4)">
+      <g transform={`translate(${(40 - w) / 2} ${(40 - h) / 2})`}>
         {K_PIXELS.map(([c, r]) => (
-          <rect key={`${c}-${r}`} x={c * 0.95 / 1} y={r * 0.95} width="0.95" height="0.95" className="fill-on-lime" />
+          <rect key={`${c}-${r}`} x={c * cell} y={r * cell} width={cell} height={cell} className="fill-on-lime" />
+        ))}
+        {SPARKLES.map(([x, y, sw, o], i) => (
+          <rect key={i} x={x * cell / 2} y={y * cell / 2} width={sw * cell / 2} height={cell / 2} fill="#fff" opacity={o} />
         ))}
       </g>
     </svg>
