@@ -26,6 +26,11 @@ export const organizePdf: Tool = {
     "Drag pages to reorder them, or use the buttons on each page to move, rotate or delete it.",
     "Export the new PDF.",
   ],
+  faqs: [
+    { q: "Is the PDF uploaded?", a: "No. Pages are rearranged inside your browser." },
+    { q: "How do I move a page?", a: "Drag a page by its grip handle onto another page, or use the arrow buttons under each thumbnail." },
+    { q: "Can I undo a deleted page?", a: "Press Reset in the settings to bring back the original page order, then make your changes again." },
+  ],
   icon: "organize",
   worker: "pdf",
   input: "each",

@@ -20,6 +20,12 @@ export const resize: Tool = {
     "Type the width and height, pick a percentage, or tap a preset.",
     "Choose how the aspect ratio is handled, then resize and download.",
   ],
+  faqs: [
+    { q: "Is my file uploaded anywhere?", a: "No. The file is opened and processed inside your browser tab. Krea has no server to receive it, and it is cleared when you press Wipe session or close the tab." },
+    { q: "What size in pixels is a 2x2 photo?", a: "At 300 DPI, which most print shops use, 2 x 2 inches is 600 x 600 pixels and 1 x 1 inch is 300 x 300 pixels. Both are presets." },
+    { q: "What is the difference between fit inside and fill and crop?", a: "Fit inside keeps the whole picture and makes it as large as possible within the size you typed, so one side may be smaller. Fill and crop gives exactly the size you typed and trims the edges that do not fit." },
+    { q: "Can I resize many photos at once?", a: "Yes. Drop several images and the same settings apply to all of them. The results download as one ZIP file." },
+  ],
   icon: "resize",
   worker: "image",
   input: "each",

@@ -21,6 +21,11 @@ export const signPdf: Tool = {
     "Make your signature: draw it, type it, or upload a photo of it.",
     "Pick the page, drag the signature into place and resize it, then sign and download.",
   ],
+  faqs: [
+    { q: "Is my signature saved or uploaded?", a: "No. Your signature exists only in this tab while you work. It is not stored, uploaded or reused." },
+    { q: "Is this a legally valid digital signature?", a: "It is a visual signature, like signing on paper and scanning it. It is not a certificate-based digital signature. Check what the receiving office accepts." },
+    { q: "Can I sign on my phone?", a: "Yes. Draw with your finger in the signature pad, then drag the signature into place on the page preview." },
+  ],
   icon: "sign",
   worker: "pdf",
   input: "each",

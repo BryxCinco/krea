@@ -22,6 +22,12 @@ export const ocr: Tool = {
     "Choose the language of the document. For PDFs you can pick specific pages.",
     "Extract, then copy the text or download it as a TXT file.",
   ],
+  faqs: [
+    { q: "Is my document sent to an OCR service?", a: "No. Text recognition runs inside your browser with Tesseract. The language data is downloaded from this site once, then cached." },
+    { q: "Does it read Filipino?", a: "Yes. Choose Filipino, or English + Filipino for documents that mix both." },
+    { q: "Why is some text wrong?", a: "OCR depends on image quality. Straight, sharp, well-lit pages with good contrast give the best results. Handwriting is usually not recognised well." },
+    { q: "Can it read a scanned PDF?", a: "Yes. Krea renders each page and reads it. You can pick specific pages to save time." },
+  ],
   icon: "ocr",
   // Tesseract runs in its own worker and PDF pages are rendered by pdf.js, so
   // this tool is coordinated from the page (see lib/ocr.ts).

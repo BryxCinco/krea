@@ -39,6 +39,12 @@ export const watermark: Tool = {
     "Type your text or pick a logo, then set the size, position and opacity. The preview updates as you go.",
     "Apply and download. Several images come out as one ZIP.",
   ],
+  faqs: [
+    { q: "Is my file uploaded anywhere?", a: "No. The file is opened and processed inside your browser tab. Krea has no server to receive it, and it is cleared when you press Wipe session or close the tab." },
+    { q: "Can I use my logo as the watermark?", a: "Yes. Choose Logo and pick an image from your device. A PNG with a transparent background looks best." },
+    { q: "How do I stop people from cropping out the watermark?", a: "Turn on Tile across the image. The mark repeats over the whole picture, which makes it much harder to remove." },
+    { q: "Can I watermark many photos at once?", a: "Yes. Drop several images; the same watermark is applied to each and you get one ZIP file." },
+  ],
   icon: "watermark",
   worker: "image",
   input: "each",

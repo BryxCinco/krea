@@ -5,6 +5,7 @@ import { AppHeader } from "@/components/ui/app-header";
 import { MotionProvider } from "@/components/ui/motion-provider";
 import { ServiceWorker } from "@/components/ui/service-worker";
 import { SessionProvider } from "@/lib/session";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 import { themeScript } from "@/lib/theme";
 import "./globals.css";
 
@@ -12,13 +13,19 @@ import "./globals.css";
 const display = Bricolage_Grotesque({ variable: "--font-display", subsets: ["latin"], display: "swap" });
 const code = JetBrains_Mono({ variable: "--font-code", subsets: ["latin"], display: "swap" });
 
+const DESCRIPTION =
+  "25 free tools for images, PDFs and documents that run entirely in your browser: compress, convert, sign and protect files, make ID photos, resumes, invoices and QR codes. No uploads, no account, works offline.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Krea: private image and PDF tools that run on your device",
+    default: "Krea: private image, PDF and document tools that run on your device",
     template: "%s | Krea",
   },
-  description:
-    "Krea is a local-first file toolkit. Compress, resize and convert images, merge, sign and protect PDFs, run OCR. Everything runs in your browser, nothing is uploaded.",
+  description: DESCRIPTION,
+  // Canonical URLs are set per page: a canonical here would be inherited by pages that lack their own.
+  openGraph: { type: "website", siteName: SITE_NAME, locale: "en_PH", description: DESCRIPTION },
+  twitter: { card: "summary_large_image" },
   applicationName: "Krea",
   appleWebApp: { capable: true, title: "Krea", statusBarStyle: "black-translucent" },
   icons: { icon: "/icons/icon.svg", apple: "/icons/icon-192.png" },

@@ -40,6 +40,12 @@ export const compress: Tool = {
     "Pick a quality level, or switch to Target size and type the limit in KB.",
     "Compare before and after, then download. Several files come out as one ZIP.",
   ],
+  faqs: [
+    { q: "Is my file uploaded anywhere?", a: "No. The file is opened and processed inside your browser tab. Krea has no server to receive it, and it is cleared when you press Wipe session or close the tab." },
+    { q: "How do I get an image under 200 KB for a government or school portal?", a: "Choose Target size and type 200 KB, or tap the Gov portal 200 KB preset. Krea lowers the quality first, then the dimensions if needed, and tells you if it could not reach the target." },
+    { q: "Will compressing make my photo look worse?", a: "Some quality is always traded for size. Use the before and after slider to check: at 70 to 80 percent quality most photos look the same at normal viewing size." },
+    { q: "Why is my PNG saved as WebP?", a: "PNG is a lossless format, so it barely shrinks. In Auto mode Krea saves PNGs as WebP, which keeps transparency and is much smaller. Pick JPG if the site you are uploading to does not accept WebP." },
+  ],
   icon: "compress",
   worker: "image",
   input: "each",

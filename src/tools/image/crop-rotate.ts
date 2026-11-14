@@ -20,6 +20,12 @@ export const cropRotate: Tool = {
     "Drag the crop box or its corners. Pick a ratio to lock the shape.",
     "Rotate or flip if needed, then apply and download.",
   ],
+  faqs: [
+    { q: "Is my file uploaded anywhere?", a: "No. The file is opened and processed inside your browser tab. Krea has no server to receive it, and it is cleared when you press Wipe session or close the tab." },
+    { q: "How do I crop to an exact ratio like 1:1 or 16:9?", a: "Pick the ratio under Crop ratio. The crop box locks to that shape; drag it or its corners to choose the area." },
+    { q: "Can I crop with the keyboard?", a: "Yes. Focus the crop box with Tab and use the arrow keys to move it. Hold Shift to move in bigger steps." },
+    { q: "Does rotating lower the quality?", a: "Rotating by 90 or 180 degrees does not resample the pixels. The image is saved again in its original format, so a JPG is re-encoded at high quality." },
+  ],
   icon: "crop",
   worker: "image",
   input: "each",

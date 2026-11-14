@@ -78,6 +78,12 @@ export const palette: Tool = {
     "Choose how many colours you want. The palette updates right away.",
     "Tap a swatch to copy its code, or download the palette as an image or JSON.",
   ],
+  faqs: [
+    { q: "Is my file uploaded anywhere?", a: "No. The file is opened and processed inside your browser tab. Krea has no server to receive it, and it is cleared when you press Wipe session or close the tab." },
+    { q: "How are the colours chosen?", a: "Krea groups similar pixels together (median cut) and shows the main colour of each group, sorted by how much of the image it covers." },
+    { q: "How do I copy a colour code?", a: "Tap a swatch to copy its HEX code, or use the HEX, RGB and HSL buttons under it." },
+    { q: "Can I save the palette?", a: "Yes. The download includes a PNG of the swatches and a JSON file with every colour in all three formats." },
+  ],
   icon: "palette",
   worker: "image",
   input: "each",

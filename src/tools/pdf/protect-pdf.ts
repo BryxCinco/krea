@@ -30,6 +30,12 @@ export const protectPdf: Tool = {
     "To protect: type a password and choose what readers may do. To unlock: type the current password.",
     "Download the new PDF. Tandaan ang password: Krea cannot recover it for you.",
   ],
+  faqs: [
+    { q: "How strong is the protection?", a: "Krea uses AES-256 encryption, the strongest standard PDF encryption. A strong, unique password matters more than anything else." },
+    { q: "I forgot my PDF password. Can Krea remove it?", a: "No. Unlocking needs the current password. Krea does not crack or bypass passwords." },
+    { q: "Is my password sent anywhere?", a: "No. The password is used inside your browser to encrypt or decrypt the file and is never stored or sent." },
+    { q: "Do the print and copy restrictions really work?", a: "PDF readers honour them, but they are easy to ignore with some tools. Rely on the open password for real protection." },
+  ],
   icon: "lock",
   worker: "pdf",
   input: "each",

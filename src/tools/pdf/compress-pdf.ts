@@ -101,6 +101,12 @@ export const compressPdf: Tool = {
     "Pick a level, or set a target size in MB and Krea will try stronger levels until it fits.",
     "Check the before and after size. If the file cannot be made smaller, Krea tells you and keeps the original.",
   ],
+  faqs: [
+    { q: "Is my PDF uploaded to compress it?", a: "No. Krea optimizes the PDF inside your browser; it never leaves your device." },
+    { q: "Why did my PDF not get smaller?", a: "Krea only shrinks the file structure and embedded JPEG photos. PDFs made mostly of text, or already optimized, may not get smaller. Krea tells you and keeps the original instead of making it worse." },
+    { q: "Will the text still be selectable?", a: "Yes. Text, fonts and vector graphics are never touched; only photos are recompressed. Pages are never turned into images." },
+    { q: "How do I get a PDF under 2 MB for email?", a: "Use the Email-safe 2 MB preset. Krea tries stronger levels until the file fits and says so if it cannot." },
+  ],
   icon: "compress-pdf",
   worker: "pdf",
   input: "each",

@@ -2,10 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ToolBrowser } from "@/components/ui/tool-browser";
 
+const DESCRIPTION =
+  "All 25 Krea tools in one place: image compressor, background remover, ID photo maker, PDF merge, compress, sign and protect, OCR, resume builder, invoice generator, QR codes and a PH take-home pay calculator. All run on your device.";
+
 export const metadata: Metadata = {
   title: "All Tools",
-  description:
-    "Every Krea tool in one place: image compressor, resizer, background remover, ID photo maker, watermark, collage, and PDF merge, split, compress, sign, protect and OCR. All run on your device.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/tools" },
+  openGraph: { url: "/tools", title: "All Krea tools", description: DESCRIPTION },
 };
 
 /** All Tools: the same card grid as the home page, for browsing and search engines. */

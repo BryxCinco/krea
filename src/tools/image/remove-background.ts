@@ -21,6 +21,12 @@ export const removeBackground: Tool = {
     "The first run downloads the AI model once (about 40 to 80 MB). After that it works offline.",
     "Keep the background transparent or pick a replacement colour, then download the PNG.",
   ],
+  faqs: [
+    { q: "Is my photo sent to an AI service?", a: "No. The AI model is downloaded from this site once and runs inside your browser. Your photo never leaves your device." },
+    { q: "Why is the first run slow?", a: "The first time, your browser loads the AI model (about 44 MB for Fast). After that it is cached, so later runs start in a few seconds and also work offline." },
+    { q: "Which model should I use?", a: "Fast works well for most portraits and products. Detailed is twice the download and handles hair and fine edges better." },
+    { q: "Can I put a white background instead of transparent?", a: "Yes. Under New background choose Solid colour and pick any colour, for example white for an ID photo." },
+  ],
   icon: "cutout",
   worker: "image",
   input: "each",

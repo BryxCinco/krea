@@ -39,6 +39,12 @@ export const idPhoto: Tool = {
     "Pick the size and background. Use Zoom and Vertical position to frame your face.",
     "Download a single photo, or a 4R or A4 sheet you can print and cut.",
   ],
+  faqs: [
+    { q: "Is my file uploaded anywhere?", a: "No. The file is opened and processed inside your browser tab. Krea has no server to receive it, and it is cleared when you press Wipe session or close the tab." },
+    { q: "What sizes can I make?", a: "2 x 2 inch, 1 x 1 inch and passport size (35 x 45 mm), all at 300 DPI. Check the exact rules of the office you are applying to, since requirements differ." },
+    { q: "How do I print the photos at the right size?", a: "Download a 4R or A4 sheet and print it at 100 percent scale. Turn off fit to page or scale to fit in the print dialog, otherwise the photos come out smaller." },
+    { q: "Does it change my face or remove blemishes?", a: "No. Krea only replaces the background and crops the photo. It does not retouch or alter your face." },
+  ],
   icon: "id",
   worker: "image",
   input: "each",

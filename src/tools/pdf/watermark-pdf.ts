@@ -20,6 +20,11 @@ export const watermarkPdf: Tool = {
     "Type the stamp text and set its size, opacity and angle. Pick pages, or leave it empty for all.",
     "Stamp and download the PDF.",
   ],
+  faqs: [
+    { q: "Is the PDF uploaded?", a: "No. The stamp is added inside your browser." },
+    { q: "Can I stamp only some pages?", a: "Yes. Type page ranges or tap pages under Pages. Leave it empty to stamp every page." },
+    { q: "Why can I not use special characters?", a: "The stamp uses a font built into every PDF reader, which covers Latin letters, numbers and common symbols. Characters outside that set are refused instead of being shown as boxes." },
+  ],
   icon: "stamp",
   worker: "pdf",
   input: "each",

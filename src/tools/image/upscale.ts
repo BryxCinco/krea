@@ -66,6 +66,12 @@ export const upscale: Tool = {
     "Choose 2x or 4x and how much sharpening you want.",
     "Upscale and download. Small images benefit most; very large ones may be refused to protect memory.",
   ],
+  faqs: [
+    { q: "Is my file uploaded anywhere?", a: "No. The file is opened and processed inside your browser tab. Krea has no server to receive it, and it is cleared when you press Wipe session or close the tab." },
+    { q: "Is this AI upscaling?", a: "No. Krea enlarges the image with high-quality resampling and sharpening. Edges look cleaner, but detail that is not in the original cannot be recreated." },
+    { q: "When is upscaling useful?", a: "For small logos, icons or screenshots that need to be printed or shown larger, and for photos that are slightly too small for an upload requirement." },
+    { q: "Is there a size limit?", a: "Yes. Results above about 64 megapixels are refused to protect your device's memory. Krea warns you before you run it." },
+  ],
   icon: "upscale",
   worker: "image",
   input: "each",

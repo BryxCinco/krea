@@ -28,6 +28,12 @@ export const imageToPdf: Tool = {
     "Drag the files into page order, then choose page size and margins.",
     "Create the PDF and download it.",
   ],
+  faqs: [
+    { q: "Is my file uploaded anywhere?", a: "No. The file is opened and processed inside your browser tab. Krea has no server to receive it, and it is cleared when you press Wipe session or close the tab." },
+    { q: "Which page size should I use for documents in the Philippines?", a: "Letter is short bond and Legal is long bond. A4 is the international standard. Same as image keeps each page the exact shape of the photo." },
+    { q: "Can I change the page order?", a: "Yes. Drag the images in the file list; pages follow the list from top to bottom." },
+    { q: "Are phone photos rotated correctly?", a: "Yes. Krea applies the photo's rotation information before placing it on the page." },
+  ],
   icon: "image-to-pdf",
   worker: "pdf",
   input: "all",

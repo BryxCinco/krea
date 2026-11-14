@@ -20,6 +20,11 @@ export const merge: Tool = {
     "Drag the files in the list into the order you want.",
     "Merge and download a single PDF.",
   ],
+  faqs: [
+    { q: "Are my PDFs uploaded to merge them?", a: "No. The PDFs are combined inside your browser, so confidential documents never leave your device." },
+    { q: "How do I change the order?", a: "Drag the files in the list, or use the up and down buttons next to each one. They are merged from top to bottom." },
+    { q: "Can I merge password-protected PDFs?", a: "Not directly. Remove the password first with Protect / Unlock PDF (you need to know it), then merge." },
+  ],
   icon: "merge",
   worker: "pdf",
   input: "all",

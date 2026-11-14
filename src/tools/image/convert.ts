@@ -20,6 +20,12 @@ export const convert: Tool = {
     "Choose the output format and, for JPG or WebP, the quality.",
     "Convert and download. Batches are zipped for you.",
   ],
+  faqs: [
+    { q: "Is my file uploaded anywhere?", a: "No. The file is opened and processed inside your browser tab. Krea has no server to receive it, and it is cleared when you press Wipe session or close the tab." },
+    { q: "Which format should I choose?", a: "JPG for photos that must work everywhere, PNG for screenshots, logos and anything with sharp text or transparency, and WebP for the smallest files on websites." },
+    { q: "What happens to transparent areas when I convert to JPG?", a: "JPG cannot store transparency, so those areas are filled with the background colour you pick (white by default)." },
+    { q: "Can I convert iPhone HEIC photos?", a: "Yes. Drop the HEIC file and Krea converts it to JPG on your device first, then you can convert it to any format." },
+  ],
   icon: "convert",
   worker: "image",
   input: "each",

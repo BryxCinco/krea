@@ -21,6 +21,11 @@ export const pdfToImage: Tool = {
     "Choose PNG or JPG and the resolution. Optionally pick only some pages.",
     "Convert and download each page, or everything as a ZIP.",
   ],
+  faqs: [
+    { q: "Is the PDF uploaded?", a: "No. Pages are rendered to images inside your browser." },
+    { q: "Which resolution should I choose?", a: "150 DPI for screens and sharing, 300 DPI for printing. Very large pages may be rendered a little lower to protect memory, and Krea says when that happens." },
+    { q: "PNG or JPG?", a: "PNG keeps text perfectly sharp; JPG makes much smaller files for scanned photos and pages with pictures." },
+  ],
   icon: "pdf-to-image",
   // pdf.js needs the DOM, so this tool is coordinated from the page while
   // pdf.js's own parser and renderer workers do the heavy lifting.

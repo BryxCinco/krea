@@ -20,6 +20,11 @@ export const split: Tool = {
     "Choose ranges (each range becomes a file), every N pages, or tap the pages you want to keep.",
     "Split and download. Multiple parts come as a ZIP.",
   ],
+  faqs: [
+    { q: "Is the PDF uploaded?", a: "No. Splitting happens inside your browser and the document stays on your device." },
+    { q: "How do I extract only certain pages?", a: "Choose Selected pages and tap the page numbers, or type ranges such as 1-3, 7. Those pages are saved together as one PDF." },
+    { q: "How do I split a PDF into separate files?", a: "Choose Page ranges and type one range per file, for example 1-3, 4-6, 7-. Leave it empty to get one file per page." },
+  ],
   icon: "split",
   worker: "pdf",
   input: "each",
