@@ -11,6 +11,7 @@
 import type { ChainProgress } from "@/lib/chain-runner";
 import { getTool } from "@/tools/registry";
 import { KreaError, type ChainStep, type ErrorCode, type ToolResult, type WorkerKind, type WorkFile } from "@/tools/types";
+import { ensureOffscreenCanvas, hasOffscreenCanvas } from "@/lib/offscreen-shim";
 import { unexpectedMessage, type FileInfo, type WorkerRequest, type WorkerResponse } from "@/workers/runtime";
 
 // The URLs must be literal so the bundler can emit each worker as its own chunk.
@@ -111,6 +112,8 @@ export interface Job {
  */
 function runOnPage(step: ChainStep, files: WorkFile[], onProgress: (progress: ChainProgress) => void): Job {
   const controller = new AbortController();
+  // Browsers without OffscreenCanvas run canvas tools here, on a <canvas>-backed shim.
+  ensureOffscreenCanvas();
   const promise = import("@/lib/chain-runner")
     .then(({ runChain }) => runChain([step], files, onProgress, controller.signal))
     .catch((error: unknown) => {
@@ -124,7 +127,8 @@ function runOnPage(step: ChainStep, files: WorkFile[], onProgress: (progress: Ch
 
 /** Run one step where its tool lives. */
 function runStep(kind: WorkerKind, step: ChainStep, files: WorkFile[], onProgress: (progress: ChainProgress) => void): Job {
-  if (kind === "pdfjs" || kind === "ocr") return runOnPage(step, files, onProgress);
+  // Our workers need OffscreenCanvas for image work; without it, run on the page instead.
+  if (kind === "pdfjs" || kind === "ocr" || !hasOffscreenCanvas()) return runOnPage(step, files, onProgress);
   return {
     promise: send<ToolResult>(kind, { type: "run", id: nextId++, steps: [step], files }, onProgress),
     cancel: () => stopWorker(kind, new CancelledError()),

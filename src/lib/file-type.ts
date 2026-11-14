@@ -3,7 +3,8 @@
  * or the browser-reported MIME type, which is often empty or wrong.
  */
 
-export type FileKind = "image" | "pdf" | "text" | "unknown";
+/** "convertible": a photo format Krea converts to JPEG when it arrives (HEIC, AVIF). */
+export type FileKind = "image" | "pdf" | "text" | "convertible" | "unknown";
 
 export interface DetectedType {
   kind: FileKind;
@@ -39,13 +40,9 @@ export async function detectFileType(file: Blob, fileName = ""): Promise<Detecte
   // Recognised but not processable: say why instead of a vague "unsupported".
   if (ascii(bytes, 4, 8) === "ftyp") {
     const brand = ascii(bytes, 8, 12);
-    if (["heic", "heix", "hevc", "mif1", "msf1", "avif"].includes(brand)) {
-      return {
-        kind: "unknown",
-        mime: brand === "avif" ? "image/avif" : "image/heic",
-        unsupported: "HEIC/AVIF photos are not supported yet. Sa phone, i-export muna as JPG.",
-      };
-    }
+    if (brand === "avif" || brand === "avis") return { kind: "convertible", mime: "image/avif" };
+    // iPhone photos. "mif1"/"msf1" are generic HEIF brands; the converter tries HEIC first, then the browser's own decoder.
+    if (["heic", "heix", "hevc", "hevx", "heim", "heis", "mif1", "msf1"].includes(brand)) return { kind: "convertible", mime: "image/heic" };
   }
   if (ascii(bytes, 0, 3) === "GIF") {
     return { kind: "unknown", mime: "image/gif", unsupported: "GIF is not supported. Use JPG, PNG or WebP." };

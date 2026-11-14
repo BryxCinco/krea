@@ -7,6 +7,7 @@
  */
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { detectFileType, MAX_FILE_BYTES, type FileKind } from "@/lib/file-type";
+import { convertToJpeg } from "@/lib/heic";
 import { probeFile, stopAllWorkers } from "@/lib/worker-client";
 import type { WorkFile } from "@/tools/types";
 import type { FileInfo } from "@/workers/runtime";
@@ -68,15 +69,28 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       const items = [...incoming];
       const accepted: StageFile[] = [];
       const problems: string[] = [];
+      let converted = 0;
 
       for (const item of items) {
-        const blob = "blob" in item ? item.blob : item;
-        const name = item.name || "pasted-file";
+        let blob = "blob" in item ? item.blob : item;
+        let name = item.name || "pasted-file";
         if (blob.size > MAX_FILE_BYTES) {
           problems.push(`"${name}" is over 200 MB, masyadong malaki.`);
           continue;
         }
-        const detected = await detectFileType(blob, name);
+        let detected = await detectFileType(blob, name);
+        if (detected.kind === "convertible") {
+          // iPhone HEIC (and AVIF): convert to JPEG first, so every image tool can use it.
+          setNotice(`Converting "${name}" to JPG…`);
+          try {
+            ({ blob, name } = await convertToJpeg(blob, name, detected.mime));
+            detected = { kind: "image", mime: "image/jpeg" };
+            converted++;
+          } catch (error) {
+            problems.push((error as Error).message);
+            continue;
+          }
+        }
         if (detected.kind !== "image" && detected.kind !== "pdf") {
           problems.push(`"${name}": ${detected.unsupported ?? "This file type has no tools yet."}`);
           continue;
@@ -92,6 +106,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (problems.length) setNotice(problems.join(" "));
+      else if (converted) setNotice(`${converted} HEIC/AVIF ${converted === 1 ? "photo" : "photos"} converted to JPG on your device.`);
       if (!accepted.length) return;
       setFiles((current) => [...current, ...accepted]);
 

@@ -18,11 +18,14 @@ import { CropBox } from "@/components/ui/crop-box";
 import { kindOfMime } from "@/lib/chains";
 import { formatBytes, IMAGE_MIMES, PDF_MIME } from "@/lib/file-type";
 import { useSession } from "@/lib/session";
+import { useFocusTrap } from "@/lib/use-focus-trap";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useObjectUrl } from "@/lib/use-object-url";
 import { CancelledError, runSteps, StepError, type Job } from "@/lib/worker-client";
 import { getTool, movesFor } from "@/tools/registry";
 import { defaultOptions, type Chain, type ChainStep, type OptionValues, type ToolResult } from "@/tools/types";
+import { collage, collageLayout } from "@/tools/image/collage";
+import { CollageSwap } from "./collage-swap";
 import { Dropzone } from "./dropzone";
 import { FileList } from "./file-list";
 import { Moves } from "./moves";
@@ -51,7 +54,7 @@ const FORMAT_LABELS: Record<string, string> = {
 const RAIL_WIDTH = 320;
 
 export function Workspace({ lockedSlug }: { lockedSlug?: string }) {
-  const { files, addFiles, clearFiles, addRecent, setNotice } = useSession();
+  const { files, addFiles, clearFiles, reorderFiles, addRecent, setNotice } = useSession();
   const [pickedSlug, setPickedSlug] = useState<string | null>(null);
   const [optionsBySlug, setOptionsBySlug] = useState<Record<string, OptionValues>>({});
   const [chain, setChain] = useState<Chain | null>(null);
@@ -62,6 +65,8 @@ export function Workspace({ lockedSlug }: { lockedSlug?: string }) {
   const desktop = useMediaQuery("(min-width: 64rem)");
   const jobRef = useRef<Job | null>(null);
   const jobKeyRef = useRef<string>("");
+  const sheetRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(railOpen && !desktop, sheetRef, () => setRailOpen(false));
   const inputRef = useRef<HTMLInputElement>(null);
   const dragDepth = useRef(0);
 
@@ -89,10 +94,26 @@ export function Workspace({ lockedSlug }: { lockedSlug?: string }) {
     else if (locked && !tool.acceptsLocked) blocked = `"${locked.name}" is password-protected. I-unlock muna gamit ang Protect / Unlock PDF.`;
     else if (files.length < minFiles) blocked = `${tool.name} needs at least ${minFiles} files. Mag-add pa.`;
   }
+  // Heads-up before heavy work. Measured on a desktop: a 35 MP photo peaked near 3 GB of browser memory,
+  // which phones usually cannot spare.
+  const largest = files.reduce<{ name: string; megapixels: number; pages: number }>(
+    (best, file) => {
+      const megapixels = ((file.info?.width ?? 0) * (file.info?.height ?? 0)) / 1e6;
+      const pages = file.info?.pages ?? 0;
+      return megapixels > best.megapixels || pages > best.pages ? { name: file.name, megapixels: Math.max(megapixels, best.megapixels), pages: Math.max(pages, best.pages) } : best;
+    },
+    { name: "", megapixels: 0, pages: 0 },
+  );
+  const sizeWarning =
+    largest.megapixels > 24
+      ? `Malaking photo (${Math.round(largest.megapixels)} MP). Computers handle it, but phones may run out of memory: resize it first if processing fails.`
+      : largest.pages > 150
+        ? `Mahabang PDF (${largest.pages} pages). This can take a while and use a lot of memory on phones.`
+        : null;
   const warning =
-    tool?.warn && !blocked
+    (tool?.warn && !blocked
       ? tool.warn(files.map((file) => ({ width: file.info?.width, height: file.info?.height, pages: file.info?.pages, bytes: file.file.size })), values)
-      : null;
+      : null) ?? (tool && !blocked ? sizeWarning : null);
 
   const fileKey = files.map((file) => file.id).join(",");
   const key = chain ? `chain:${chain.id}|${fileKey}` : `move:${tool?.slug}|${fileKey}`;
@@ -226,7 +247,7 @@ export function Workspace({ lockedSlug }: { lockedSlug?: string }) {
   }, []);
 
   const acceptList = lockedTool ? lockedTool.accepts : [...IMAGE_MIMES, PDF_MIME];
-  const formats = acceptList.map((mime) => FORMAT_LABELS[mime]).join(" · ");
+  const formats = [...acceptList.map((mime) => FORMAT_LABELS[mime]), ...(acceptList.some((mime) => mime.startsWith("image/")) ? ["HEIC"] : [])].join(" · ");
   const openPicker = () => inputRef.current?.click();
 
   // Chains need one kind of file on the Stage.
@@ -292,6 +313,19 @@ export function Workspace({ lockedSlug }: { lockedSlug?: string }) {
         afterLabel={`After ${formatBytes(firstOutput.blob.size)}`}
       />
     );
+  } else if (outputUrl && tool?.slug === collage.slug && result?.files.length === 1) {
+    preview = (
+      <CollageSwap
+        src={outputUrl}
+        layout={collageLayout(files.length, values)}
+        names={files.map((file) => file.name)}
+        onSwap={(a, b) => {
+          const next = [...files];
+          [next[a], next[b]] = [next[b], next[a]];
+          reorderFiles(next);
+        }}
+      />
+    );
   } else if (outputUrl) {
     // eslint-disable-next-line @next/next/no-img-element -- local blob URL
     preview = <img src={outputUrl} alt="Result preview" className="checkerboard max-h-[56vh] max-w-full rounded-md border border-line" />;
@@ -328,7 +362,7 @@ export function Workspace({ lockedSlug }: { lockedSlug?: string }) {
         ref={inputRef}
         type="file"
         multiple
-        accept={acceptList.join(",")}
+        accept={[...acceptList, ...(acceptList.some((mime) => mime.startsWith("image/")) ? [".heic", ".heif", "image/heic", "image/heif", "image/avif"] : [])].join(",")}
         className="sr-only"
         tabIndex={-1}
         aria-hidden
@@ -359,6 +393,7 @@ export function Workspace({ lockedSlug }: { lockedSlug?: string }) {
             <div key="sheet" className="fixed inset-0 z-[60]">
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setRailOpen(false)} className="absolute inset-0 bg-scrim" />
               <motion.div
+                ref={sheetRef}
                 role="dialog"
                 aria-modal="true"
                 aria-label="Chains and recent Moves"
