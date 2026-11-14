@@ -28,5 +28,8 @@ export const SPARKLES: [number, number, number, number][] = (() => {
   star(16.5, 12.5, 3);
   star(20.5, 6.5, 1);
   star(19.5, 19.5, 1);
+  // sparkle on the stem, plus a soft vertical shine strip
+  star(3, 18, 2);
+  for (let y = 6; y <= 13; y++) out.push([1, y, 1, y % 2 ? 0.35 : 0.2]);
   return out;
 })();
