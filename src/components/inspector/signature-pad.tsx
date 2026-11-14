@@ -3,6 +3,7 @@
 import { Eraser, Upload } from "lucide-react";
 import { Caveat } from "next/font/google";
 import { useEffect, useRef, useState } from "react";
+import { onTabListKeyDown } from "@/lib/use-focus-trap";
 
 // Handwriting font for typed signatures. Self-hosted at build time; only fetched when this panel is used.
 const script = Caveat({ subsets: ["latin"], weight: "600", preload: false, display: "swap" });
@@ -168,7 +169,7 @@ export function SignaturePad({ value, onChange }: { value: string; onChange: (da
 
   return (
     <div>
-      <div role="tablist" aria-label="Signature method" className="grid grid-cols-3 gap-1 rounded-md border border-line bg-ink p-1">
+      <div role="tablist" onKeyDown={onTabListKeyDown} aria-label="Signature method" className="grid grid-cols-3 gap-1 rounded-md border border-line bg-ink p-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}

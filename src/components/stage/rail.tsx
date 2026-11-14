@@ -5,6 +5,7 @@ import { ChainsPanel, type ChainsPanelProps } from "@/components/chains/chains-p
 import { downloadBlob, downloadZip } from "@/lib/download";
 import { formatBytes } from "@/lib/file-type";
 import { useSession } from "@/lib/session";
+import { onTabListKeyDown } from "@/lib/use-focus-trap";
 
 export type RailTab = "chains" | "recent";
 
@@ -22,7 +23,7 @@ export function Rail({ tab, onTab, chains }: { tab: RailTab; onTab: (tab: RailTa
 
   return (
     <div className="flex h-full flex-col">
-      <div role="tablist" aria-label="Side panel" className="grid grid-cols-2 gap-1 border-b border-line p-2">
+      <div role="tablist" onKeyDown={onTabListKeyDown} aria-label="Side panel" className="grid grid-cols-2 gap-1 border-b border-line p-2">
         {tabs.map(({ id, label, icon: Icon }) => (
           <button
             key={id}

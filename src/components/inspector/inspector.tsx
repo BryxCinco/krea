@@ -2,7 +2,8 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Play, SlidersHorizontal, Square, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
+import { useFocusTrap } from "@/lib/use-focus-trap";
 import { Button } from "@/components/ui/button";
 import { ToolIcon } from "@/components/ui/icon";
 import type { OptionValues, Tool } from "@/tools/types";
@@ -46,12 +47,8 @@ export function Inspector(props: InspectorProps) {
   const { tool, values, pageCount, blocked, warning, onChange } = props;
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  useEffect(() => {
-    if (!sheetOpen) return;
-    const onKey = (event: KeyboardEvent) => event.key === "Escape" && setSheetOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [sheetOpen]);
+  const sheet = useRef<HTMLDivElement>(null);
+  useFocusTrap(sheetOpen, sheet, () => setSheetOpen(false));
 
   const heading = (
     <div className="flex items-center gap-2">
@@ -103,6 +100,7 @@ export function Inspector(props: InspectorProps) {
               className="absolute inset-0 bg-scrim"
             />
             <motion.div
+              ref={sheet}
               role="dialog"
               aria-modal="true"
               aria-label={`${tool.name} settings`}
@@ -114,7 +112,7 @@ export function Inspector(props: InspectorProps) {
             >
               <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
                 {heading}
-                <Button variant="ghost" icon aria-label="Close settings" autoFocus onClick={() => setSheetOpen(false)}>
+                <Button variant="ghost" icon aria-label="Close settings" onClick={() => setSheetOpen(false)}>
                   <X aria-hidden className="size-5" strokeWidth={1.75} />
                 </Button>
               </div>

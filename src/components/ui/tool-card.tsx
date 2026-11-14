@@ -51,19 +51,28 @@ export function ToolCard({ tool, index, fit }: { tool: ToolCardData; index: numb
       onPointerLeave={onLeave}
       onPointerCancel={onLeave}
       style={{ "--i": Math.min(index, 14) } as React.CSSProperties}
-      className={`tool-card group flex h-full gap-4 overflow-hidden rounded-2xl border bg-panel p-4 sm:flex-col sm:p-5 ${
-        fit === "match" ? "border-accent" : "border-line hover:border-accent"
-      } ${fit === "dim" ? "opacity-45" : ""}`}
+      className={`tool-card group flex h-full gap-4 overflow-hidden rounded-2xl border p-4 sm:flex-col sm:p-5 ${
+        fit === "match" ? "border-accent bg-panel" : fit === "dim" ? "border-dashed border-line bg-ink hover:border-accent" : "border-line bg-panel hover:border-accent"
+      }`}
     >
+      {/* Dimmed cards fade only the icon; all text keeps full AA contrast. */}
       <span
         className={`flex size-12 shrink-0 items-center justify-center rounded-xl transition-colors ${
-          fit === "match" ? "bg-lime text-on-lime" : "bg-raised text-accent group-hover:bg-lime group-hover:text-on-lime"
+          fit === "match"
+            ? "bg-lime text-on-lime"
+            : fit === "dim"
+              ? "bg-raised text-muted opacity-50 group-hover:opacity-100"
+              : "bg-raised text-accent group-hover:bg-lime group-hover:text-on-lime"
         }`}
       >
         <ToolIcon name={tool.icon} className="size-6" />
       </span>
       <span className="flex min-w-0 flex-1 flex-col">
-        <span className="font-mono text-[11px] uppercase tracking-widest text-muted">{tool.categoryLabel}</span>
+        <span className="flex flex-wrap items-baseline gap-x-2 font-mono text-[11px] uppercase tracking-widest text-muted">
+          {tool.categoryLabel}
+          {fit === "match" && <span className="text-accent">Works with your file</span>}
+          {fit === "dim" && <span>Not for this file</span>}
+        </span>
         <span className="mt-1 text-lg font-semibold leading-tight text-fg">{tool.name}</span>
         <span className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted">{tool.description}</span>
         <span className="mt-auto flex items-center gap-1 pt-3 text-sm font-medium text-accent">
