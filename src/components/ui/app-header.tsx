@@ -15,13 +15,25 @@ import { ThemeToggle } from "./theme-toggle";
 /** Fired to open the Chains panel on the Stage. */
 export const OPEN_CHAINS_EVENT = "krea:open-chains";
 
-/** Krea mark: a "K" drawn as a stem and two render lines, with the signal dot. */
+/** Krea mark: the pixel-art K on a lime tile (same grid as /icons/icon.svg). */
+const K_PIXELS: [number, number][] = [];
+for (let r = 0; r < 13; r++) {
+  for (let c = 0; c < 11; c++) {
+    const up = r <= 6 && c >= 8 - r && c < 11 - r && c >= 2;
+    const down = r >= 6 && c >= r - 4 && c < r - 1;
+    if (c < 3 || up || down) K_PIXELS.push([c, r]);
+  }
+}
+
 function LogoMark() {
   return (
-    <svg aria-hidden viewBox="0 0 40 40" className="size-9 shrink-0 lg:size-10">
+    <svg aria-hidden viewBox="0 0 40 40" shapeRendering="crispEdges" className="size-9 shrink-0 lg:size-10">
       <rect width="40" height="40" rx="9" className="fill-lime" />
-      <path d="M13 9v22M13 21.5 25 9.5M17.5 17 27 31" fill="none" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" className="stroke-on-lime" />
-      <circle cx="30" cy="11" r="2.6" className="fill-signal" />
+      <g transform="translate(6.5 5.5) scale(2.4)">
+        {K_PIXELS.map(([c, r]) => (
+          <rect key={`${c}-${r}`} x={c * 0.95 / 1} y={r * 0.95} width="0.95" height="0.95" className="fill-on-lime" />
+        ))}
+      </g>
     </svg>
   );
 }
@@ -77,7 +89,7 @@ export function AppHeader() {
           <span className="flex flex-col leading-none">
             <span className="text-2xl font-extrabold tracking-tight text-fg lg:text-[1.7rem]">krea</span>
             <span className="mt-1 hidden font-mono text-[10px] uppercase tracking-[0.18em] text-muted min-[400px]:block">
-              Kinetic Render Engine
+              Kinetic Render Engine App
             </span>
             <span className="sr-only">, home</span>
           </span>

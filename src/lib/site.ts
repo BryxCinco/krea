@@ -14,7 +14,7 @@ function resolveSiteUrl(): string {
 
 export const SITE_URL = resolveSiteUrl();
 export const SITE_NAME = "Krea";
-export const SITE_TAGLINE = "Kinetic Render Engine";
+export const SITE_TAGLINE = "Kinetic Render Engine App";
 
 /** Absolute URL for a path on this site. */
 export const absoluteUrl = (path: string) => `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;

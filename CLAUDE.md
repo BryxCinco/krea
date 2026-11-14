@@ -1,4 +1,4 @@
-# Krea (Kinetic Render Engine)
+# Krea (Kinetic Render Engine App)
 
 @AGENTS.md
 
