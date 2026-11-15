@@ -1,6 +1,6 @@
 # Krea (Kinetic Render Engine App)
 
-A local-first, privacy-first toolkit for images, PDFs and documents. 25 tools run entirely in the browser: compress, convert, watermark and upscale images, make ID photos and collages, merge, compress, sign and password-protect PDFs, read text with OCR, and write Markdown, resumes, invoices, QR codes and PH take-home pay calculations.
+A local-first, privacy-first toolkit for images, PDFs and documents. 35 tools run entirely in the browser: compress, convert, watermark, upscale, redact and strip metadata from images, make ID photos, collages and signatures, scan documents, merge, compress, sign, number and password-protect PDFs, read text with OCR, write Markdown, resumes and invoices, make QR codes and barcodes, generate passwords, compute PH take-home, 13th month, overtime and loan payments, and compress videos or turn them into GIFs.
 
 There is no backend, no database and no account. Files never leave the device, and the app makes no requests to third parties.
 

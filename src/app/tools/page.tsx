@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ToolBrowser } from "@/components/ui/tool-browser";
 
 const DESCRIPTION =
-  "All 25 Krea tools in one place: image compressor, background remover, ID photo maker, PDF merge, compress, sign and protect, OCR, resume builder, invoice generator, QR codes and a PH take-home pay calculator. All run on your device.";
+  "All 35 Krea tools in one place: image compressor, background remover, ID photo maker, EXIF remover, blur and redact, document scanner, PDF merge, compress, sign, protect and page numbers, OCR, resume builder, invoice generator, QR and barcodes, passwords, PH pay calculators and a video compressor. All run on your device.";
 
 export const metadata: Metadata = {
   title: "All Tools",
