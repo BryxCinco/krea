@@ -33,6 +33,7 @@ import { markdown } from "./text/markdown";
 import { payroll } from "./text/payroll";
 import { qr } from "./text/qr";
 import { resume } from "./text/resume";
+import { textToolkit } from "./text/text-toolkit";
 import type { Move, Tool, ToolCategory } from "./types";
 
 export const tools: Tool[] = [
@@ -68,6 +69,7 @@ export const tools: Tool[] = [
   stripMetadataTool,
   signatureMaker,
   pageNumbers,
+  textToolkit,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

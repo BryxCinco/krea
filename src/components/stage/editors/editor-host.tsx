@@ -22,6 +22,7 @@ const editors = {
   "invoice-generator": dynamic(() => import("./invoice-editor"), { ssr: false, loading: EditorSkeleton }),
   "qr-code-generator": dynamic(() => import("./qr-editor"), { ssr: false, loading: EditorSkeleton }),
   "signature-maker": dynamic(() => import("./signature-editor"), { ssr: false, loading: EditorSkeleton }),
+  "text-toolkit": dynamic(() => import("./text-toolkit-editor"), { ssr: false, loading: EditorSkeleton }),
   "ph-take-home-pay-calculator": dynamic(() => import("./payroll-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 

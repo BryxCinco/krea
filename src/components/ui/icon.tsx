@@ -17,6 +17,7 @@ import {
   LockKeyhole,
   Maximize2,
   Palette,
+  Pilcrow,
   QrCode,
   ReceiptText,
   Repeat2,
@@ -59,6 +60,7 @@ const icons: Record<IconKey, LucideIcon> = {
   payroll: Calculator,
   metadata: EyeOff,
   pagenumber: Hash,
+  text: Pilcrow,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {
