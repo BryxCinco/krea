@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   LayoutGrid,
   LockKeyhole,
+  KeyRound,
   Maximize2,
   Palette,
   Pilcrow,
@@ -61,6 +62,7 @@ const icons: Record<IconKey, LucideIcon> = {
   metadata: EyeOff,
   pagenumber: Hash,
   text: Pilcrow,
+  password: KeyRound,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

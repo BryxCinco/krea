@@ -30,6 +30,7 @@ import { split } from "./pdf/split";
 import { watermarkPdf } from "./pdf/watermark-pdf";
 import { invoice } from "./text/invoice";
 import { markdown } from "./text/markdown";
+import { password } from "./text/password";
 import { payroll } from "./text/payroll";
 import { qr } from "./text/qr";
 import { resume } from "./text/resume";
@@ -70,6 +71,7 @@ export const tools: Tool[] = [
   signatureMaker,
   pageNumbers,
   textToolkit,
+  password,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
