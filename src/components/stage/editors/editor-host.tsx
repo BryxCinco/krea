@@ -25,6 +25,7 @@ const editors = {
   "text-toolkit": dynamic(() => import("./text-toolkit-editor"), { ssr: false, loading: EditorSkeleton }),
   "password-generator": dynamic(() => import("./password-editor"), { ssr: false, loading: EditorSkeleton }),
   "barcode-generator-scanner": dynamic(() => import("./barcode-editor"), { ssr: false, loading: EditorSkeleton }),
+  "blur-redact": dynamic(() => import("./redact-editor"), { ssr: false, loading: EditorSkeleton }),
   "ph-take-home-pay-calculator": dynamic(() => import("./payroll-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 

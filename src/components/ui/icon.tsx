@@ -28,6 +28,7 @@ import {
   Shrink,
   Signature,
   Split,
+  SquareDashed,
   Stamp,
   Type,
   type LucideIcon,
@@ -65,6 +66,7 @@ const icons: Record<IconKey, LucideIcon> = {
   text: Pilcrow,
   password: KeyRound,
   barcode: Barcode,
+  redact: SquareDashed,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

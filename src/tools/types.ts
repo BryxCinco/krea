@@ -139,7 +139,8 @@ export type IconKey =
   | "pagenumber"
   | "text"
   | "password"
-  | "barcode";
+  | "barcode"
+  | "redact";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

@@ -12,6 +12,7 @@ import { cropRotate } from "./image/crop-rotate";
 import { idPhoto } from "./image/id-photo";
 import { palette } from "./image/palette";
 import { removeBackground } from "./image/remove-background";
+import { redact } from "./image/redact";
 import { resize } from "./image/resize";
 import { signatureMaker } from "./image/signature-maker";
 import { stripMetadataTool } from "./image/strip-metadata";
@@ -74,6 +75,7 @@ export const tools: Tool[] = [
   textToolkit,
   password,
   barcode,
+  redact,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
