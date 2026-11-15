@@ -8,7 +8,7 @@ import { ToolIcon } from "@/components/ui/icon";
 import { useSession } from "@/lib/session";
 import { applyTheme } from "@/lib/theme";
 import { OPEN_CHAINS_EVENT } from "@/components/ui/app-header";
-import { tools } from "@/tools/registry";
+import { categories, tools } from "@/tools/registry";
 
 /** Fired by the header button to open the palette. */
 export const OPEN_PALETTE_EVENT = "krea:open-palette";
@@ -66,7 +66,7 @@ export function CommandPalette() {
       ...tools.map((tool) => ({
         id: tool.slug,
         label: tool.name,
-        detail: tool.category.toUpperCase(),
+        detail: (categories.find((entry) => entry.id === tool.category)?.label ?? tool.category).toUpperCase(),
         keywords: `${tool.verb} ${tool.description}`,
         icon: <ToolIcon name={tool.icon} />,
         run: () => router.push(`/tools/${tool.slug}`),

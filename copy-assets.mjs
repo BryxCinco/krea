@@ -28,6 +28,10 @@ for (const file of ["pdf.worker.min.mjs", "pdf.renderer.min.mjs"]) copy(`pdfjs-d
 mkdirSync("public/vendor/qpdf", { recursive: true });
 copy("@neslinesli93/qpdf-wasm/dist/qpdf.wasm", "vendor/qpdf/qpdf.wasm");
 
+// ZXing-C++ (WebAssembly): the QR and barcode scanner's fallback when the browser has no BarcodeDetector.
+mkdirSync("public/vendor/zxing", { recursive: true });
+copy("zxing-wasm/dist/reader/zxing_reader.wasm", "vendor/zxing/zxing_reader.wasm");
+
 // Tesseract OCR: worker, the LSTM cores (it picks one by CPU features; the
 // .wasm.js files embed the WebAssembly, so nothing else is needed) and language data.
 mkdirSync("public/tesseract/core", { recursive: true });
@@ -128,6 +132,7 @@ const entry = (path, group) => ({ url: `/${path.replaceAll("\\", "/")}`, size: s
 const files = [
   ...walk("pdfjs").map((path) => entry(path, "PDF engines")),
   entry("vendor/qpdf/qpdf.wasm", "PDF engines"),
+  entry("vendor/zxing/zxing_reader.wasm", "Barcode scanner"),
   entry("tesseract/worker.min.js", "OCR"),
   ...tesseractCores.map((core) => entry(`tesseract/core/${core}`, "OCR")),
   ...["eng", "fil"].map((language) => entry(`tesseract/lang/${language}.traineddata.gz`, "OCR")),

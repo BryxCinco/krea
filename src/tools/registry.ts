@@ -28,6 +28,7 @@ import { protectPdf } from "./pdf/protect-pdf";
 import { signPdf } from "./pdf/sign-pdf";
 import { split } from "./pdf/split";
 import { watermarkPdf } from "./pdf/watermark-pdf";
+import { barcode } from "./text/barcode";
 import { invoice } from "./text/invoice";
 import { markdown } from "./text/markdown";
 import { password } from "./text/password";
@@ -72,12 +73,14 @@ export const tools: Tool[] = [
   pageNumbers,
   textToolkit,
   password,
+  barcode,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
   { id: "image", label: "Photo & Image" },
   { id: "pdf", label: "PDF" },
   { id: "text", label: "Text & Docs" },
+  { id: "code", label: "QR & Barcode" },
 ];
 
 export function getTool(slug: string): Tool | undefined {

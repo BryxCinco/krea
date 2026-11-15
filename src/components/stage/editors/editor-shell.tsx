@@ -9,8 +9,8 @@ interface EditorShellProps {
   label: string;
   form: ReactNode;
   preview: ReactNode;
-  /** Export and other actions. Shown under the form on desktop, in the bottom bar on phones. */
-  actions: ReactNode;
+  /** Export and other actions. Shown under the form on desktop, in the bottom bar on phones. Omit when the preview holds its own controls. */
+  actions?: ReactNode;
   /** Autosave status, when the editor saves to this device. */
   saved?: "saved" | "pending" | "error";
   previewLabel?: string;
@@ -68,7 +68,7 @@ export function EditorShell({ label, form, preview, actions, saved, previewLabel
       <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-8">
         <div className={`${view === "edit" ? "" : "hidden"} min-w-0 lg:block`}>
           <div className="flex flex-col gap-5">{form}</div>
-          <div className="mt-6 hidden flex-wrap items-center gap-2 lg:flex">{actions}</div>
+          {actions && <div className="mt-6 hidden flex-wrap items-center gap-2 lg:flex">{actions}</div>}
           <div className="mt-3 hidden lg:block">{status}</div>
         </div>
         <div className={`${view === "preview" ? "" : "hidden"} min-w-0 lg:block`}>
@@ -77,10 +77,12 @@ export function EditorShell({ label, form, preview, actions, saved, previewLabel
       </div>
 
       {/* Phone action bar. */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-panel/95 px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
-        <div className="mb-1.5">{status}</div>
-        <div className="flex gap-2 overflow-x-auto [&>*]:shrink-0">{actions}</div>
-      </div>
+      {actions && (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-panel/95 px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+          <div className="mb-1.5">{status}</div>
+          <div className="flex gap-2 overflow-x-auto [&>*]:shrink-0">{actions}</div>
+        </div>
+      )}
     </section>
   );
 }

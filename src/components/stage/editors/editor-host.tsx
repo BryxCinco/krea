@@ -24,6 +24,7 @@ const editors = {
   "signature-maker": dynamic(() => import("./signature-editor"), { ssr: false, loading: EditorSkeleton }),
   "text-toolkit": dynamic(() => import("./text-toolkit-editor"), { ssr: false, loading: EditorSkeleton }),
   "password-generator": dynamic(() => import("./password-editor"), { ssr: false, loading: EditorSkeleton }),
+  "barcode-generator-scanner": dynamic(() => import("./barcode-editor"), { ssr: false, loading: EditorSkeleton }),
   "ph-take-home-pay-calculator": dynamic(() => import("./payroll-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 

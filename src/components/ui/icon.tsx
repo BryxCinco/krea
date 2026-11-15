@@ -1,5 +1,6 @@
 /** Maps the registry's string icon keys to lucide line icons, so workers never import React. */
 import {
+  Barcode,
   Calculator,
   Combine,
   Crop,
@@ -63,6 +64,7 @@ const icons: Record<IconKey, LucideIcon> = {
   pagenumber: Hash,
   text: Pilcrow,
   password: KeyRound,
+  barcode: Barcode,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

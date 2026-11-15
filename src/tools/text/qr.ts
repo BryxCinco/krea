@@ -32,7 +32,7 @@ export const qr = editorTool({
     { q: "PNG or SVG?", a: "PNG for messaging and social media. SVG for printing, because it stays sharp at any size." },
   ],
   icon: "qr",
-});
+}, "code");
 
 export type QrKind = "text" | "url" | "wifi" | "payment";
 export type ErrorLevel = "L" | "M" | "Q" | "H";
