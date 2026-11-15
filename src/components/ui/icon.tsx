@@ -11,6 +11,7 @@ import {
   FilePen,
   FileUser,
   FileOutput,
+  HandCoins,
   Hash,
   IdCard,
   LayoutDashboard,
@@ -67,6 +68,7 @@ const icons: Record<IconKey, LucideIcon> = {
   password: KeyRound,
   barcode: Barcode,
   redact: SquareDashed,
+  paycalc: HandCoins,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

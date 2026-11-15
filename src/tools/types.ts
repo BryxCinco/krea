@@ -140,7 +140,8 @@ export type IconKey =
   | "text"
   | "password"
   | "barcode"
-  | "redact";
+  | "redact"
+  | "paycalc";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

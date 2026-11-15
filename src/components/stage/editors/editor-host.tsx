@@ -27,6 +27,7 @@ const editors = {
   "barcode-generator-scanner": dynamic(() => import("./barcode-editor"), { ssr: false, loading: EditorSkeleton }),
   "blur-redact": dynamic(() => import("./redact-editor"), { ssr: false, loading: EditorSkeleton }),
   "ph-take-home-pay-calculator": dynamic(() => import("./payroll-editor"), { ssr: false, loading: EditorSkeleton }),
+  "ph-pay-calculators": dynamic(() => import("./ph-pay-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 
 export function EditorHost({ slug }: { slug: string }) {

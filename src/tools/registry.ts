@@ -34,6 +34,7 @@ import { invoice } from "./text/invoice";
 import { markdown } from "./text/markdown";
 import { password } from "./text/password";
 import { payroll } from "./text/payroll";
+import { phPay } from "./text/ph-pay";
 import { qr } from "./text/qr";
 import { resume } from "./text/resume";
 import { textToolkit } from "./text/text-toolkit";
@@ -76,6 +77,7 @@ export const tools: Tool[] = [
   password,
   barcode,
   redact,
+  phPay,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
