@@ -44,7 +44,8 @@ If it is not set, Krea uses Vercel's production domain (`VERCEL_PROJECT_PRODUCTI
 
 - **Home** has the Stage on top and the tool cards below. Drop, paste or pick files; Krea sniffs the real file type, offers the Moves that fit, and highlights the matching cards. iPhone HEIC photos are converted to JPEG on arrival.
 - **Workers**: file tools run in Web Workers, so the page stays responsive and Cancel stops a job instantly. PDF rendering and OCR are coordinated from the page while pdf.js and Tesseract work in their own workers. Browsers without `OffscreenCanvas` (older iOS) run image tools on the page instead.
-- **Text & Docs tools** (Markdown, resume, invoice, QR, take-home pay) are editors with their own UI in `src/components/stage/editors/`. Markdown, resume and invoice data autosave to `localStorage`; QR and pay data are never saved. "Save as PDF" prints a standalone document through the browser's print dialog, which produces a real, selectable PDF.
+- **Editor tools** have their own UI in `src/components/stage/editors/`: Markdown, resume, invoice, QR, take-home pay, Signature Maker, Text Toolkit, Password, Barcode & QR Scanner, Blur & Redact, PH Pay Calculators, Document Scanner and Video Compressor. Markdown, resume and invoice data autosave to `localStorage`; signatures are saved only when you press Save (up to 6, with Delete); passwords, salaries, loans, photos, scans and videos are never saved. "Save as PDF" prints a standalone document through the browser's print dialog, which produces a real, selectable PDF.
+- **Video** (tool 35) uses the browser's own WebCodecs encoder through Mediabunny, not ffmpeg.wasm (whose core is GPL and about 31 MB). Browsers without WebCodecs get a clear message.
 - **Command Palette**: `Ctrl+K` or `/` jumps to any tool, opens Chains, or switches the theme.
 
 ### Theme system
@@ -57,7 +58,7 @@ Chains run several Moves in sequence on the Stage files (Chains button or header
 
 ### Offline behaviour
 
-`public/sw.js` caches the app on first visit. Engine files go into a separate cache that survives deploys (bump `VENDOR` in `sw.js` when pdf.js, qpdf, Tesseract or the model change; bump `VERSION` for app-shell changes). Big engines cache on first use, or all at once with **Make offline-ready** on the Privacy page and in the phone menu (about 75 MB; the 88 MB Detailed background model still caches on first use).
+`public/sw.js` caches the app on first visit. Engine files go into a separate cache that survives deploys (bump `VENDOR` in `sw.js` when pdf.js, qpdf, Tesseract or the model change; bump `VERSION` for app-shell changes). Big engines cache on first use, or all at once with **Make offline-ready** on the Privacy page and in the phone menu (about 80 MB; the 88 MB Detailed background model still caches on first use).
 
 ## Adding a tool
 
@@ -117,3 +118,5 @@ Every page is prerendered; there are no server functions doing work for users.
 ## License note
 
 Krea uses `@imgly/background-removal`, which is licensed **AGPL-3.0**. Serving it on a public website may oblige you to publish Krea's source under the AGPL. Check this before launch: publish the source, buy IMG.LY's commercial license, or replace the background-removal engine. See `LAUNCH-CHECKLIST.md`.
+
+Other licences that carry duties: `heic-to` (LGPL-3.0), Mediabunny (MPL-2.0, used unmodified), the EFF Large Wordlist (CC BY 3.0 US, attributed on `/about`), and ZXing-C++ inside `zxing-wasm` (Apache-2.0). Everything else is MIT, ISC or Apache-2.0. The full list is on `/about`.

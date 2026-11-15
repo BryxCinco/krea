@@ -22,6 +22,11 @@ const CREDITS: [string, string, string][] = [
   ["marked and DOMPurify", "MIT; MPL-2.0 or Apache-2.0", "Markdown preview"],
   ["node-qrcode", "MIT", "QR codes"],
   ["JSZip", "MIT or GPL-3.0", "ZIP downloads"],
+  ["JsBarcode", "MIT", "Barcodes"],
+  ["barcode-detector and zxing-wasm (ZXing-C++)", "MIT; Apache-2.0", "Reading QR codes and barcodes"],
+  ["Mediabunny", "MPL-2.0", "Reading, trimming and re-encoding video with the browser's encoder"],
+  ["gifenc", "MIT", "Making GIFs"],
+  ["SecLists common password list", "MIT", "Spotting common passwords in the strength checker"],
   ["Next.js, React, Framer Motion", "MIT", "The app itself"],
   ["Lucide", "ISC", "Icons"],
 ];
@@ -70,6 +75,17 @@ export default function AboutPage() {
             </li>
           ))}
         </ul>
+        <p>
+          Passphrases use the{" "}
+          <a href="https://www.eff.org/deeplinks/2016/07/new-wordlists-random-passphrases" rel="noopener noreferrer" target="_blank">
+            EFF Large Wordlist
+          </a>{" "}
+          by the Electronic Frontier Foundation, licensed under{" "}
+          <a href="https://creativecommons.org/licenses/by/3.0/us/" rel="noopener noreferrer" target="_blank">
+            CC BY 3.0 US
+          </a>
+          . Krea uses its 7,776 words unchanged, without the dice numbers.
+        </p>
       </ContentSection>
     </ContentPage>
   );
