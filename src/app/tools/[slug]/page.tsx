@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps<"/tools/[slug]">): 
   };
 }
 
-const APPLICATION_CATEGORY = { image: "MultimediaApplication", pdf: "BusinessApplication", text: "BusinessApplication", code: "UtilitiesApplication" } as const;
+const APPLICATION_CATEGORY = { image: "MultimediaApplication", pdf: "BusinessApplication", text: "BusinessApplication", code: "UtilitiesApplication", video: "MultimediaApplication" } as const;
 
 export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
   const tool = getTool((await params).slug);

@@ -18,6 +18,7 @@ import { resize } from "./image/resize";
 import { signatureMaker } from "./image/signature-maker";
 import { stripMetadataTool } from "./image/strip-metadata";
 import { upscale } from "./image/upscale";
+import { video } from "./image/video";
 import { watermark } from "./image/watermark";
 import { compressPdf } from "./pdf/compress-pdf";
 import { imageToPdf } from "./pdf/image-to-pdf";
@@ -80,6 +81,7 @@ export const tools: Tool[] = [
   redact,
   phPay,
   docScan,
+  video,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
@@ -87,6 +89,7 @@ export const categories: { id: ToolCategory; label: string }[] = [
   { id: "pdf", label: "PDF" },
   { id: "text", label: "Text & Docs" },
   { id: "code", label: "QR & Barcode" },
+  { id: "video", label: "Video" },
 ];
 
 export function getTool(slug: string): Tool | undefined {

@@ -29,6 +29,7 @@ const editors = {
   "ph-take-home-pay-calculator": dynamic(() => import("./payroll-editor"), { ssr: false, loading: EditorSkeleton }),
   "ph-pay-calculators": dynamic(() => import("./ph-pay-editor"), { ssr: false, loading: EditorSkeleton }),
   "document-scanner": dynamic(() => import("./doc-scan-editor"), { ssr: false, loading: EditorSkeleton }),
+  "video-compressor-gif": dynamic(() => import("./video-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 
 export function EditorHost({ slug }: { slug: string }) {

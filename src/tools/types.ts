@@ -7,7 +7,7 @@
  * the main thread stays cheap.
  */
 
-export type ToolCategory = "image" | "pdf" | "text" | "code";
+export type ToolCategory = "image" | "pdf" | "text" | "code" | "video";
 
 /**
  * Where a tool runs.
@@ -142,7 +142,8 @@ export type IconKey =
   | "barcode"
   | "redact"
   | "paycalc"
-  | "scan";
+  | "scan"
+  | "video";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

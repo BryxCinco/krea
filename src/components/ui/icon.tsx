@@ -26,6 +26,7 @@ import {
   Repeat2,
   Scaling,
   ScanLine,
+  Clapperboard,
   ScanText,
   Shrink,
   Signature,
@@ -71,6 +72,7 @@ const icons: Record<IconKey, LucideIcon> = {
   redact: SquareDashed,
   paycalc: HandCoins,
   scan: ScanLine,
+  video: Clapperboard,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {
