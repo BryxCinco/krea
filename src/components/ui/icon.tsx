@@ -25,6 +25,7 @@ import {
   ReceiptText,
   Repeat2,
   Scaling,
+  ScanLine,
   ScanText,
   Shrink,
   Signature,
@@ -69,6 +70,7 @@ const icons: Record<IconKey, LucideIcon> = {
   barcode: Barcode,
   redact: SquareDashed,
   paycalc: HandCoins,
+  scan: ScanLine,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

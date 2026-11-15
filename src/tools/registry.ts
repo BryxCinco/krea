@@ -9,6 +9,7 @@ import { collage } from "./image/collage";
 import { compress } from "./image/compress";
 import { convert } from "./image/convert";
 import { cropRotate } from "./image/crop-rotate";
+import { docScan } from "./image/doc-scan";
 import { idPhoto } from "./image/id-photo";
 import { palette } from "./image/palette";
 import { removeBackground } from "./image/remove-background";
@@ -78,6 +79,7 @@ export const tools: Tool[] = [
   barcode,
   redact,
   phPay,
+  docScan,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
