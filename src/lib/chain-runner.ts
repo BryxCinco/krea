@@ -61,6 +61,7 @@ export async function runChain(
       // Batch: one file at a time keeps peak memory at a single decoded file.
       const outputs: WorkFile[] = [];
       const texts: string[] = [];
+      let textView: Extract<NonNullable<ToolResult["view"]>, { type: "text" }> | undefined;
       view = undefined;
       for (let i = 0; i < files.length; i++) {
         const result = await tool.run([files[i]], step.options, {
@@ -72,12 +73,13 @@ export async function runChain(
         if (result.note && !notes.includes(result.note)) notes.push(result.note);
         // On-screen content: text from several files is joined; otherwise the first file's view is shown.
         if (result.view?.type === "text") {
+          textView ??= result.view;
           texts.push(files.length > 1 ? `=== ${files[i].name} ===\n${result.view.text}` : result.view.text);
         } else {
           view ??= result.view;
         }
       }
-      if (texts.length) view = { type: "text", text: texts.join("\n\n") };
+      if (texts.length) view = { type: "text", text: texts.join("\n\n"), label: textView?.label, keepSize: textView?.keepSize };
       files = outputs;
     }
   }

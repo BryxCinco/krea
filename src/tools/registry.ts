@@ -13,6 +13,7 @@ import { idPhoto } from "./image/id-photo";
 import { palette } from "./image/palette";
 import { removeBackground } from "./image/remove-background";
 import { resize } from "./image/resize";
+import { stripMetadataTool } from "./image/strip-metadata";
 import { upscale } from "./image/upscale";
 import { watermark } from "./image/watermark";
 import { compressPdf } from "./pdf/compress-pdf";
@@ -61,6 +62,8 @@ export const tools: Tool[] = [
   invoice,
   qr,
   payroll,
+  // Milestone 4 (26-35)
+  stripMetadataTool,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

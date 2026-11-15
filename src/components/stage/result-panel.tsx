@@ -71,14 +71,14 @@ function PaletteView({ colors }: { colors: PaletteColor[] }) {
   );
 }
 
-function TextView({ text }: { text: string }) {
+function TextView({ text, label }: { text: string; label?: string }) {
   const copy = useCopy();
   return (
     <div className="mt-3">
       <textarea
         readOnly
         value={text}
-        aria-label="Extracted text"
+        aria-label={label ?? "Extracted text"}
         rows={Math.min(16, Math.max(5, text.split("\n").length + 1))}
         className="w-full resize-y rounded-md border border-line bg-ink p-3 font-mono text-sm leading-relaxed text-fg"
       />
@@ -108,7 +108,7 @@ export function ResultPanel({ result, inputBytes, stale, title, onReuse }: Resul
   const change = inputBytes ? Math.round((outputBytes / inputBytes - 1) * 100) : 0;
   // Palettes and text are not files you would keep editing on the Stage.
   const reusable = files.every((file) => file.type.startsWith("image/") || file.type === "application/pdf");
-  const showSize = !view;
+  const showSize = !view || (view.type === "text" && view.keepSize === true);
 
   return (
     <section aria-label="Result" className={`rounded-xl border border-accent/60 bg-panel p-4 transition-opacity ${stale ? "opacity-60" : ""}`}>
@@ -128,7 +128,7 @@ export function ResultPanel({ result, inputBytes, stale, title, onReuse }: Resul
       {note && <p className="mt-2 text-sm leading-relaxed text-fg">{note}</p>}
 
       {view?.type === "palette" && <PaletteView colors={view.colors} />}
-      {view?.type === "text" && <TextView text={view.text} />}
+      {view?.type === "text" && <TextView text={view.text} label={view.label} />}
 
       <ul className="mt-3 flex max-h-64 flex-col gap-1.5 overflow-y-auto">
         {files.map((file, index) => (

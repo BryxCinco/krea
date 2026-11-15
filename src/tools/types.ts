@@ -89,7 +89,7 @@ export interface PaletteColor {
 }
 
 /** Extra result content shown on screen in addition to (or instead of) files. */
-export type ResultView = { type: "palette"; colors: PaletteColor[] } | { type: "text"; text: string };
+export type ResultView = { type: "palette"; colors: PaletteColor[] } | { type: "text"; text: string; label?: string; keepSize?: boolean };
 
 export interface ToolResult {
   files: WorkFile[];
@@ -134,7 +134,8 @@ export type IconKey =
   | "resume"
   | "invoice"
   | "qr"
-  | "payroll";
+  | "payroll"
+  | "metadata";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
@@ -154,7 +155,7 @@ export interface Faq {
 }
 
 export interface Tool {
-  /** Stable number from the product spec (1-25). */
+  /** Stable number from the product spec (1-35). */
   id: number;
   /**
    * "file" (default): transforms files on the Stage, runs in a worker.

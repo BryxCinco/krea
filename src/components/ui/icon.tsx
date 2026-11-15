@@ -4,6 +4,7 @@ import {
   Combine,
   Crop,
   Eraser,
+  EyeOff,
   FileArchive,
   FileImage,
   FilePen,
@@ -55,6 +56,7 @@ const icons: Record<IconKey, LucideIcon> = {
   invoice: ReceiptText,
   qr: QrCode,
   payroll: Calculator,
+  metadata: EyeOff,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {
