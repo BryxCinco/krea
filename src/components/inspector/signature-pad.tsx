@@ -3,6 +3,8 @@
 import { Eraser, Upload } from "lucide-react";
 import { Caveat } from "next/font/google";
 import { useEffect, useRef, useState } from "react";
+import { useSavedSignatures } from "@/lib/saved-signatures";
+import { trimmedDataUrl } from "@/lib/signature-canvas";
 import { onTabListKeyDown } from "@/lib/use-focus-trap";
 
 // Handwriting font for typed signatures. Self-hosted at build time; only fetched when this panel is used.
@@ -19,42 +21,14 @@ const INKS = [
 const PAD_WIDTH = 900;
 const PAD_HEIGHT = 320;
 
-/** Crop a canvas to the pixels that were actually drawn on and return a PNG data URL ("" if empty). */
-function trimmedDataUrl(canvas: HTMLCanvasElement): string {
-  const ctx = canvas.getContext("2d")!;
-  const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  let top = height;
-  let left = width;
-  let right = -1;
-  let bottom = -1;
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      if (data[(y * width + x) * 4 + 3] > 12) {
-        if (x < left) left = x;
-        if (x > right) right = x;
-        if (y < top) top = y;
-        if (y > bottom) bottom = y;
-      }
-    }
-  }
-  if (right < 0) return "";
-  const pad = 8;
-  left = Math.max(0, left - pad);
-  top = Math.max(0, top - pad);
-  right = Math.min(width - 1, right + pad);
-  bottom = Math.min(height - 1, bottom + pad);
-  const out = document.createElement("canvas");
-  out.width = right - left + 1;
-  out.height = bottom - top + 1;
-  out.getContext("2d")!.drawImage(canvas, left, top, out.width, out.height, 0, 0, out.width, out.height);
-  return out.toDataURL("image/png");
-}
-
 /** Signature field: draw with a finger, stylus or mouse; type a name; or upload a photo of a signature. */
 export function SignaturePad({ value, onChange }: { value: string; onChange: (dataUrl: string) => void }) {
   const [mode, setMode] = useState<Mode>("draw");
   const [ink, setInk] = useState(INKS[0].value);
   const [typed, setTyped] = useState("");
+  const saved = useSavedSignatures();
+  // A signature picked from the ones saved in the Signature Maker.
+  const [pickedId, setPickedId] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
   const last = useRef<{ x: number; y: number } | null>(null);
@@ -63,6 +37,7 @@ export function SignaturePad({ value, onChange }: { value: string; onChange: (da
     const canvas = canvasRef.current;
     canvas?.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
     setTyped("");
+    setPickedId(null);
     onChange("");
   };
 
@@ -75,6 +50,7 @@ export function SignaturePad({ value, onChange }: { value: string; onChange: (da
   const onPointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
+    setPickedId(null);
     drawing.current = true;
     last.current = point(event);
     // A tap without movement still leaves a dot.
@@ -187,6 +163,31 @@ export function SignaturePad({ value, onChange }: { value: string; onChange: (da
         ))}
       </div>
 
+      {saved.length > 0 && (
+        <div className="mt-2">
+          <p className="mb-1 text-xs text-muted">Saved on this device (from Signature Maker)</p>
+          <ul aria-label="Saved signatures" className="flex gap-1.5 overflow-x-auto pb-1">
+            {saved.map((entry, index) => (
+              <li key={entry.id} className="shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPickedId(entry.id);
+                    onChange(entry.dataUrl);
+                  }}
+                  aria-label={`Use saved signature ${index + 1}`}
+                  aria-pressed={pickedId === entry.id}
+                  className={`block min-h-10 rounded-md border bg-paper p-1 ${pickedId === entry.id ? "border-accent" : "border-line hover:border-muted"}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element -- data URL */}
+                  <img src={entry.dataUrl} alt="" className="h-10 w-auto max-w-28 object-contain" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="mt-2">
         {mode === "draw" && (
           <canvas
@@ -208,6 +209,7 @@ export function SignaturePad({ value, onChange }: { value: string; onChange: (da
             value={typed}
             onChange={(event) => {
               setTyped(event.target.value);
+              setPickedId(null);
               if (!event.target.value.trim()) onChange("");
             }}
             placeholder="Type your name"
@@ -225,7 +227,7 @@ export function SignaturePad({ value, onChange }: { value: string; onChange: (da
       </div>
 
       {/* Preview of what will be placed on the page. */}
-      {value && mode !== "draw" && (
+      {value && (mode !== "draw" || pickedId) && (
         // eslint-disable-next-line @next/next/no-img-element -- data URL
         <img src={value} alt="Your signature" className="mt-2 max-h-24 w-full rounded-md border border-line bg-paper object-contain p-2" />
       )}

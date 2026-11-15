@@ -4,15 +4,16 @@
  * that keeps its data in localStorage. This fills in the file-tool fields so
  * they never show up as Moves or chain steps.
  */
-import { KreaError, type Tool } from "../types";
+import { KreaError, type Tool, type ToolCategory } from "../types";
 
 type EditorMeta = Pick<Tool, "id" | "slug" | "name" | "verb" | "description" | "seoTitle" | "seoDescription" | "howTo" | "faqs" | "icon">;
 
-export function editorTool(meta: EditorMeta): Tool {
+/** Editors live under "Text & Docs" unless they belong with another family (the Signature Maker is an image tool). */
+export function editorTool(meta: EditorMeta, category: ToolCategory = "text"): Tool {
   return {
     ...meta,
     kind: "editor",
-    category: "text",
+    category,
     accepts: [],
     output: "data",
     worker: "image",

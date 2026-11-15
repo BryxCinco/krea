@@ -13,6 +13,7 @@ import { idPhoto } from "./image/id-photo";
 import { palette } from "./image/palette";
 import { removeBackground } from "./image/remove-background";
 import { resize } from "./image/resize";
+import { signatureMaker } from "./image/signature-maker";
 import { stripMetadataTool } from "./image/strip-metadata";
 import { upscale } from "./image/upscale";
 import { watermark } from "./image/watermark";
@@ -64,6 +65,7 @@ export const tools: Tool[] = [
   payroll,
   // Milestone 4 (26-35)
   stripMetadataTool,
+  signatureMaker,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
