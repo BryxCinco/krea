@@ -421,7 +421,7 @@ export default function RedactEditor() {
             onPointerUp={onPointerUp}
             onPointerCancel={onPointerUp}
             onKeyDown={onKeyDown}
-            className="block max-h-[70vh] w-full cursor-crosshair touch-none rounded-lg object-contain"
+            className="mx-auto block h-auto max-h-[70vh] w-auto max-w-full cursor-crosshair touch-none rounded-lg"
           />
           <p className="mt-3 font-mono text-xs text-muted">
             {boxes.length} {boxes.length === 1 ? "box" : "boxes"} · saved at {photo.width} × {photo.height} px, {extensionFor(photo.type).toUpperCase()}, no metadata
