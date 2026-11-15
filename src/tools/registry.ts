@@ -22,6 +22,7 @@ import { imageToPdf } from "./pdf/image-to-pdf";
 import { merge } from "./pdf/merge";
 import { ocr } from "./pdf/ocr";
 import { organizePdf } from "./pdf/organize-pdf";
+import { pageNumbers } from "./pdf/page-numbers";
 import { pdfToImage } from "./pdf/pdf-to-image";
 import { protectPdf } from "./pdf/protect-pdf";
 import { signPdf } from "./pdf/sign-pdf";
@@ -66,6 +67,7 @@ export const tools: Tool[] = [
   // Milestone 4 (26-35)
   stripMetadataTool,
   signatureMaker,
+  pageNumbers,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

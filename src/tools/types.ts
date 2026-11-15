@@ -135,7 +135,8 @@ export type IconKey =
   | "invoice"
   | "qr"
   | "payroll"
-  | "metadata";
+  | "metadata"
+  | "pagenumber";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

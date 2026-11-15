@@ -10,6 +10,7 @@ import {
   FilePen,
   FileUser,
   FileOutput,
+  Hash,
   IdCard,
   LayoutDashboard,
   LayoutGrid,
@@ -57,6 +58,7 @@ const icons: Record<IconKey, LucideIcon> = {
   qr: QrCode,
   payroll: Calculator,
   metadata: EyeOff,
+  pagenumber: Hash,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {
