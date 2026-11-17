@@ -19,6 +19,7 @@ import { signatureMaker } from "./image/signature-maker";
 import { stripMetadataTool } from "./image/strip-metadata";
 import { upscale } from "./image/upscale";
 import { video } from "./image/video";
+import { videoTrim } from "./image/video-trim";
 import { watermark } from "./image/watermark";
 import { compressPdf } from "./pdf/compress-pdf";
 import { imageToPdf } from "./pdf/image-to-pdf";
@@ -82,6 +83,8 @@ export const tools: Tool[] = [
   phPay,
   docScan,
   video,
+  // Milestone 5 (36-42): video tools
+  videoTrim,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
