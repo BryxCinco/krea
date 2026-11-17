@@ -78,6 +78,7 @@ const icons: Record<IconKey, LucideIcon> = {
   trim: Scissors,
   speed: Gauge,
   vcrop: Crop,
+  vwatermark: Stamp,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

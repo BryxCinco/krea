@@ -427,6 +427,60 @@ export async function cropVideo(file: Blob, info: VideoInfo, options: CropOption
   return { blob: result.blob, container };
 }
 
+// ---------------------------------------------------------------- tool 39: watermark
+
+export interface WatermarkOptions extends JobControl {
+  draw: (ctx: CanvasRenderingContext2D, width: number, height: number) => void;
+}
+
+/**
+ * Draw every frame onto a canvas, add the overlay with `draw`, and encode that canvas. The canvas
+ * is reused frame to frame; Mediabunny copies it into a new frame each time. Audio is copied.
+ */
+export async function watermarkVideo(file: Blob, info: VideoInfo, options: WatermarkOptions): Promise<{ blob: Blob; container: Container }> {
+  let container: Container = "mp4";
+  const canvas = document.createElement("canvas");
+  try {
+    const result = await runConversion(
+      file,
+      async (mb, input) => {
+        container = await containerOf(mb, input);
+        const spec = CONTAINERS[container];
+        const codec = await pickVideoCodec(mb, spec.video, info.width, info.height);
+        const ctx = canvas.getContext("2d")!;
+        return {
+          format: outputFormat(mb, container),
+          mime: spec.mime,
+          options: {
+            tracks: "primary",
+            video: {
+              codec,
+              bitrate: mb.QUALITY_HIGH,
+              forceTranscode: true,
+              process: (sample) => {
+                const w = sample.displayWidth;
+                const h = sample.displayHeight;
+                if (canvas.width !== w || canvas.height !== h) {
+                  canvas.width = w;
+                  canvas.height = h;
+                }
+                ctx.clearRect(0, 0, w, h);
+                sample.draw(ctx, 0, 0, w, h);
+                options.draw(ctx, w, h);
+                return canvas;
+              },
+            },
+          },
+        };
+      },
+      options,
+    );
+    return { blob: result.blob, container };
+  } finally {
+    canvas.width = canvas.height = 0;
+  }
+}
+
 export function canvasPixels(canvas: HTMLCanvasElement | OffscreenCanvas): ImageData {
   const ctx = canvas.getContext("2d", { willReadFrequently: true }) as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
   return ctx.getImageData(0, 0, canvas.width, canvas.height);

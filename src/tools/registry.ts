@@ -22,6 +22,7 @@ import { video } from "./image/video";
 import { videoSpeed } from "./image/video-speed";
 import { videoCrop } from "./image/video-crop";
 import { videoTrim } from "./image/video-trim";
+import { videoWatermark } from "./image/video-watermark";
 import { watermark } from "./image/watermark";
 import { compressPdf } from "./pdf/compress-pdf";
 import { imageToPdf } from "./pdf/image-to-pdf";
@@ -89,6 +90,7 @@ export const tools: Tool[] = [
   videoTrim,
   videoSpeed,
   videoCrop,
+  videoWatermark,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

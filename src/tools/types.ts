@@ -146,7 +146,8 @@ export type IconKey =
   | "video"
   | "trim"
   | "speed"
-  | "vcrop";
+  | "vcrop"
+  | "vwatermark";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
