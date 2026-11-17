@@ -144,7 +144,8 @@ export type IconKey =
   | "paycalc"
   | "scan"
   | "video"
-  | "trim";
+  | "trim"
+  | "speed";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

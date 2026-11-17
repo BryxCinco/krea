@@ -298,6 +298,92 @@ export async function trimVideo(file: Blob, info: VideoInfo, options: TrimOption
   return { ...encoded, copied: false, container, actualStart, reencoded: true };
 }
 
+// ---------------------------------------------------------------- tool 37: speed
+
+export interface SpeedOptions extends JobControl {
+  speed: number;
+  /** "keep" time-stretches the audio with the pitch kept; "mute" drops it. */
+  audio: "keep" | "mute";
+}
+
+/** Output frame rate cap when speeding up (frames in between are dropped). */
+const SPEED_MAX_FPS = 60;
+
+/**
+ * Change the speed. Video frames are re-timed (and thinned out above 60 fps when speeding up; slow
+ * motion repeats nothing, each frame just lasts longer). Audio goes through the WSOLA time-stretcher,
+ * so voices keep their pitch. Both use the same clock, so they stay in sync. The container is kept.
+ */
+export async function speedVideo(file: Blob, info: VideoInfo, options: SpeedOptions): Promise<{ blob: Blob; container: Container }> {
+  const { speed } = options;
+  if (!(speed >= 0.25 && speed <= 4) || speed === 1) throw new KreaError("failed", "Pick a speed from 0.25x to 4x (not 1x).");
+  const { TimeStretcher, keepFrame } = await import("./time-stretch");
+  let container: Container = "mp4";
+  const result = await runConversion(
+    file,
+    async (mb, input) => {
+      container = await containerOf(mb, input);
+      const spec = CONTAINERS[container];
+      const codec = await pickVideoCodec(mb, spec.video, info.width, info.height);
+      const audioCodec = options.audio === "keep" && info.hasAudio ? await mb.getFirstEncodableAudioCodec(spec.audio) : null;
+      let lastKept: number | null = null;
+      let stretcher: InstanceType<typeof TimeStretcher> | null = null;
+      let audioStart = 0;
+      let emitted = 0;
+      return {
+        format: outputFormat(mb, container),
+        mime: spec.mime,
+        options: {
+          tracks: "primary",
+          video: {
+            codec,
+            bitrate: mb.QUALITY_HIGH,
+            forceTranscode: true,
+            process: (sample) => {
+              const timestamp = sample.timestamp / speed;
+              if (speed > 1 && !keepFrame(timestamp, lastKept, SPEED_MAX_FPS)) return null;
+              lastKept = timestamp;
+              const out = sample.clone();
+              out.setTimestamp(timestamp);
+              out.setDuration(speed > 1 ? Math.max(sample.duration / speed, 1 / SPEED_MAX_FPS) : sample.duration / speed);
+              return out;
+            },
+          },
+          audio: audioCodec
+            ? {
+                codec: audioCodec,
+                bitrate: 160_000,
+                forceTranscode: true,
+                process: (sample) => {
+                  const channels = sample.numberOfChannels;
+                  if (!stretcher) {
+                    stretcher = new TimeStretcher(sample.sampleRate, channels, speed);
+                    audioStart = sample.timestamp / speed;
+                  }
+                  const planes = Array.from({ length: channels }, (_, plane) => {
+                    const data = new Float32Array(sample.numberOfFrames);
+                    sample.copyTo(data, { planeIndex: plane, format: "f32-planar" });
+                    return data;
+                  });
+                  const out = stretcher.push(planes);
+                  const frames = out[0].length;
+                  if (!frames) return [];
+                  const data = new Float32Array(frames * channels);
+                  out.forEach((plane, c) => data.set(plane, c * frames));
+                  const stretched = new mb.AudioSample({ data, format: "f32-planar", numberOfChannels: channels, sampleRate: sample.sampleRate, timestamp: audioStart + emitted / sample.sampleRate });
+                  emitted += frames;
+                  return stretched;
+                },
+              }
+            : { discard: true },
+        },
+      };
+    },
+    options,
+  );
+  return { blob: result.blob, container };
+}
+
 export function canvasPixels(canvas: HTMLCanvasElement | OffscreenCanvas): ImageData {
   const ctx = canvas.getContext("2d", { willReadFrequently: true }) as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
   return ctx.getImageData(0, 0, canvas.width, canvas.height);
