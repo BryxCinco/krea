@@ -384,6 +384,49 @@ export async function speedVideo(file: Blob, info: VideoInfo, options: SpeedOpti
   return { blob: result.blob, container };
 }
 
+// ---------------------------------------------------------------- tool 38: crop and rotate
+
+export interface CropOptions extends JobControl {
+  rotate: 0 | 90 | 180 | 270;
+  flip: boolean;
+  /** In pixels of the rotated and flipped picture; already even. Null keeps the whole picture. */
+  crop: { left: number; top: number; width: number; height: number } | null;
+}
+
+/** Rotate, flip and crop, baked into the frames (not left as metadata some players ignore). Audio is copied when possible. */
+export async function cropVideo(file: Blob, info: VideoInfo, options: CropOptions): Promise<{ blob: Blob; container: Container }> {
+  let container: Container = "mp4";
+  const result = await runConversion(
+    file,
+    async (mb, input) => {
+      container = await containerOf(mb, input);
+      const spec = CONTAINERS[container];
+      const turned = options.rotate === 90 || options.rotate === 270;
+      const width = options.crop?.width ?? (turned ? info.height : info.width);
+      const height = options.crop?.height ?? (turned ? info.width : info.height);
+      const codec = await pickVideoCodec(mb, spec.video, width, height);
+      return {
+        format: outputFormat(mb, container),
+        mime: spec.mime,
+        options: {
+          tracks: "primary",
+          video: {
+            codec,
+            bitrate: mb.QUALITY_HIGH,
+            rotate: options.rotate,
+            flip: options.flip,
+            crop: options.crop ?? undefined,
+            allowTransformationMetadata: false,
+            forceTranscode: true,
+          },
+        },
+      };
+    },
+    options,
+  );
+  return { blob: result.blob, container };
+}
+
 export function canvasPixels(canvas: HTMLCanvasElement | OffscreenCanvas): ImageData {
   const ctx = canvas.getContext("2d", { willReadFrequently: true }) as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
   return ctx.getImageData(0, 0, canvas.width, canvas.height);

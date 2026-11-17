@@ -32,6 +32,7 @@ const editors = {
   "video-compressor-gif": dynamic(() => import("./video-editor"), { ssr: false, loading: EditorSkeleton }),
   "video-trimmer": dynamic(() => import("./trim-editor"), { ssr: false, loading: EditorSkeleton }),
   "video-speed": dynamic(() => import("./speed-editor"), { ssr: false, loading: EditorSkeleton }),
+  "video-crop-rotate": dynamic(() => import("./crop-video-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 
 export function EditorHost({ slug }: { slug: string }) {

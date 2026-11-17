@@ -77,6 +77,7 @@ const icons: Record<IconKey, LucideIcon> = {
   video: Clapperboard,
   trim: Scissors,
   speed: Gauge,
+  vcrop: Crop,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

@@ -20,6 +20,7 @@ import { stripMetadataTool } from "./image/strip-metadata";
 import { upscale } from "./image/upscale";
 import { video } from "./image/video";
 import { videoSpeed } from "./image/video-speed";
+import { videoCrop } from "./image/video-crop";
 import { videoTrim } from "./image/video-trim";
 import { watermark } from "./image/watermark";
 import { compressPdf } from "./pdf/compress-pdf";
@@ -87,6 +88,7 @@ export const tools: Tool[] = [
   // Milestone 5 (36-42): video tools
   videoTrim,
   videoSpeed,
+  videoCrop,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
