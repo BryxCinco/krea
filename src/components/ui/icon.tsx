@@ -89,6 +89,7 @@ const icons: Record<IconKey, LucideIcon> = {
   frames: Images,
   "txt-pdf": FileType,
   "csv-pdf": FileSpreadsheet,
+  pdfcrop: Crop,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

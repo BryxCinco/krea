@@ -152,7 +152,8 @@ export type IconKey =
   | "vconvert"
   | "frames"
   | "txt-pdf"
-  | "csv-pdf";
+  | "csv-pdf"
+  | "pdfcrop";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
