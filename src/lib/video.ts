@@ -274,7 +274,7 @@ export async function trimVideo(file: Blob, info: VideoInfo, options: TrimOption
           const track = await input.getPrimaryVideoTrack();
           const key = track ? await new mb.EncodedPacketSink(track).getKeyPacket(range.start, { verifyKeyPackets: true }).catch(() => null) : null;
           if (key) actualStart = Math.min(range.start, key.timestamp);
-          return { format: outputFormat(mb, container), mime: spec.mime, options: { tracks: "primary", trim: range, copy: { mode: "forced", boundaryPolicy: "expand" } } };
+          return { format: outputFormat(mb, container), mime: spec.mime, options: { tracks: "primary", trim: range, copy: { mode: "forced", boundaryPolicy: "expand", shiftTolerance: Infinity } } };
         }
         actualStart = range.start;
         const codec = await pickVideoCodec(mb, spec.video, info.width, info.height);
@@ -525,7 +525,7 @@ export async function extractAudio(file: Blob, info: VideoInfo, options: AudioOp
     async (mb) => {
       if (options.format === "mp3") await ensureMp3Encoder(mb);
       const format = options.format === "mp3" ? new mb.Mp3OutputFormat() : options.format === "wav" ? new mb.WavOutputFormat() : new mb.Mp4OutputFormat({ fastStart: "in-memory" });
-      if (copy) return { format, mime: spec.mime, options: { tracks: "primary", video: { discard: true }, trim: range, copy: { mode: "forced", boundaryPolicy: "expand" } } };
+      if (copy) return { format, mime: spec.mime, options: { tracks: "primary", video: { discard: true }, trim: range, copy: { mode: "forced", boundaryPolicy: "expand", shiftTolerance: Infinity } } };
       if (options.format === "m4a" && !(await mb.canEncodeAudio("aac"))) throw new KreaError("unsupported", "This browser cannot encode AAC. Choose MP3 or WAV.");
       const codec = options.format === "mp3" ? "mp3" : options.format === "wav" ? "pcm-s16" : "aac";
       return {
