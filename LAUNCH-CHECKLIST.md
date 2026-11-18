@@ -54,6 +54,10 @@ These match published 2026 schedules from several payroll guides, but no agency 
 - [ ] Real loan offers (bank, Pag-IBIG, lending app) through the Loan tab: compare the monthly payment with the lender's disclosure statement.
 - [ ] Real phone videos (portrait, HDR, variable frame rate, 4K) through the Video Compressor; check audio sync in the result.
 - [ ] **Video Format Converter**: an iPhone MOV (H.264 and HEVC) to MP4 with Original quality (should copy, not re-encode), and an MP4 to WebM. Confirm the codec note matches the result.
+- [ ] **Redact PDF** on a real document with a TIN or account number: after download, select all text and search in Acrobat or Chrome; nothing under the boxes may be found, and the marked pages must be images.
+- [ ] **PDF Form Filler** on a real BIR, SSS or Pag-IBIG fillable form: values show in Acrobat, Chrome and Preview, with and without Lock answers.
+- [ ] **CSV to PDF** with an Excel CSV saved on Windows (semicolons, Windows-1252 accents, peso amounts) and a Google Sheets export.
+- [ ] **ZIP to PDF** with a phone's exported photo folder (HEIC is skipped, JPG/PNG kept) and a ZIP made on a Mac (__MACOSX ignored).
 - [ ] **Extract Frames**: every 1 s over a 1-minute 1080p clip as JPG (ZIP of about 60 images), and three picked moments as PNG. Check the frames match the player at those times.
 - [ ] Real PDFs from government portals and banks through Merge, Compress, Sign and Protect/Unlock; open the outputs in Adobe Reader, Chrome and a phone viewer.
 - [ ] Open a protected PDF made by Krea in Adobe Reader and confirm the password and print/copy restrictions behave.
