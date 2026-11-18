@@ -10,6 +10,7 @@
 import type * as Mediabunny from "mediabunny";
 import { KreaError } from "@/tools/types";
 import { gifSize, gifTimestamps, targetSize, trimRange, type Preset } from "@/tools/image/video";
+import { FRAME_FORMATS, frameSize, MAX_FRAMES, type FrameFormat } from "@/tools/image/video-frames";
 
 export type MB = typeof Mediabunny;
 
@@ -593,6 +594,60 @@ export async function convertVideo(file: Blob, info: VideoInfo, options: Convert
     options,
   );
   return { blob: result.blob, copied: false, videoCodec, audioCodec, dropped: result.dropped };
+}
+
+// ---------------------------------------------------------------- tool 42: extract frames
+
+export interface FramesOptions extends JobControl {
+  /** Times in seconds, already sorted and inside the video. */
+  times: number[];
+  format: FrameFormat;
+  /** Width cap in pixels; 0 keeps the video's size. */
+  width: number;
+}
+export interface ExtractedFrame {
+  blob: Blob;
+  /** The frame's own timestamp, which can be a little before the asked time. */
+  time: number;
+}
+
+function canvasBlob(canvas: HTMLCanvasElement | OffscreenCanvas, mime: string, quality: number): Promise<Blob> {
+  if ("convertToBlob" in canvas) return canvas.convertToBlob({ type: mime, quality });
+  return new Promise((resolve, reject) => canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("toBlob"))), mime, quality));
+}
+
+/**
+ * Decode the frame shown at each time and save it as PNG or JPG. Frames come from the browser's
+ * WebCodecs decoder through Mediabunny's CanvasSink (the frame at or before each time, as a player shows it).
+ */
+export async function extractFrames(file: Blob, info: VideoInfo, options: FramesOptions): Promise<ExtractedFrame[]> {
+  if (!options.times.length) throw new KreaError("failed", "Walang napiling oras. Add at least one moment or pick an interval.");
+  if (options.times.length > MAX_FRAMES) throw new KreaError("failed", `Masyadong marami ang frames (${options.times.length}). Krea saves up to ${MAX_FRAMES} at a time: use a longer interval or a shorter part.`);
+  const { mb, input } = await openInput(file);
+  try {
+    const track = await input.getPrimaryVideoTrack();
+    if (!track) throw new KreaError("unsupported", "Walang video track na nabasa.");
+    const size = frameSize(info.width, info.height, options.width);
+    const spec = FRAME_FORMATS[options.format];
+    const sink = new mb.CanvasSink(track, { width: size.width, height: size.height, fit: "fill", poolSize: 1 });
+    const frames: ExtractedFrame[] = [];
+    let done = 0;
+    for await (const frame of sink.canvasesAtTimestamps(options.times)) {
+      if (options.signal.aborted) throw new KreaError("failed", "Cancelled.");
+      // The canvas is reused for the next frame, so encode it before moving on.
+      if (frame) frames.push({ blob: await canvasBlob(frame.canvas, spec.mime, 0.92), time: frame.timestamp });
+      options.onProgress(++done / options.times.length);
+      await yieldToPage();
+    }
+    if (!frames.length) throw new KreaError("failed", "Walang frame na nabasa sa mga oras na ito. Pick other moments.");
+    return frames;
+  } catch (error) {
+    if (error instanceof KreaError) throw error;
+    if (options.signal.aborted) throw new KreaError("failed", "Cancelled.");
+    throw new KreaError("failed", "Hindi nakuha ang frames. Try a smaller size or fewer frames.");
+  } finally {
+    input.dispose();
+  }
 }
 
 export function canvasPixels(canvas: HTMLCanvasElement | OffscreenCanvas): ImageData {

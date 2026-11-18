@@ -149,7 +149,8 @@ export type IconKey =
   | "vcrop"
   | "vwatermark"
   | "audio"
-  | "vconvert";
+  | "vconvert"
+  | "frames";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

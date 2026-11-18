@@ -15,6 +15,7 @@ import {
   HandCoins,
   Hash,
   IdCard,
+  Images,
   LayoutDashboard,
   LayoutGrid,
   LockKeyhole,
@@ -83,6 +84,7 @@ const icons: Record<IconKey, LucideIcon> = {
   vwatermark: Stamp,
   audio: Music,
   vconvert: FileVideo,
+  frames: Images,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {
