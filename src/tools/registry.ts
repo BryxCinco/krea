@@ -43,6 +43,7 @@ import { signPdf } from "./pdf/sign-pdf";
 import { split } from "./pdf/split";
 import { txtToPdf } from "./pdf/txt-to-pdf";
 import { watermarkPdf } from "./pdf/watermark-pdf";
+import { zipToPdf } from "./pdf/zip-to-pdf";
 import { barcode } from "./text/barcode";
 import { invoice } from "./text/invoice";
 import { markdown } from "./text/markdown";
@@ -108,6 +109,7 @@ export const tools: Tool[] = [
   cropPdf,
   flattenPdf,
   formFiller,
+  zipToPdf,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

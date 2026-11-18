@@ -155,7 +155,8 @@ export type IconKey =
   | "csv-pdf"
   | "pdfcrop"
   | "flatten"
-  | "form";
+  | "form"
+  | "zip-pdf";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

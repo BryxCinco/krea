@@ -24,6 +24,7 @@ import {
   KeyRound,
   Layers,
   Maximize2,
+  Package,
   Palette,
   Pilcrow,
   QrCode,
@@ -94,6 +95,7 @@ const icons: Record<IconKey, LucideIcon> = {
   pdfcrop: Crop,
   flatten: Layers,
   form: ClipboardPen,
+  "zip-pdf": Package,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {
