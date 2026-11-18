@@ -32,6 +32,7 @@ import {
   Scaling,
   ScanLine,
   Clapperboard,
+  ClipboardPen,
   Scissors,
   Gauge,
   Music,
@@ -92,6 +93,7 @@ const icons: Record<IconKey, LucideIcon> = {
   "csv-pdf": FileSpreadsheet,
   pdfcrop: Crop,
   flatten: Layers,
+  form: ClipboardPen,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

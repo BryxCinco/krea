@@ -30,6 +30,7 @@ import { watermark } from "./image/watermark";
 import { compressPdf } from "./pdf/compress-pdf";
 import { cropPdf } from "./pdf/crop-pdf";
 import { flattenPdf } from "./pdf/flatten-pdf";
+import { formFiller } from "./pdf/form-filler";
 import { csvToPdf } from "./pdf/csv-to-pdf";
 import { imageToPdf } from "./pdf/image-to-pdf";
 import { merge } from "./pdf/merge";
@@ -106,6 +107,7 @@ export const tools: Tool[] = [
   csvToPdf,
   cropPdf,
   flattenPdf,
+  formFiller,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

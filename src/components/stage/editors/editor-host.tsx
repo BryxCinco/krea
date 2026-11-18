@@ -37,6 +37,7 @@ const editors = {
   "video-to-mp3": dynamic(() => import("./audio-editor"), { ssr: false, loading: EditorSkeleton }),
   "video-converter": dynamic(() => import("./convert-video-editor"), { ssr: false, loading: EditorSkeleton }),
   "extract-frames": dynamic(() => import("./frames-editor"), { ssr: false, loading: EditorSkeleton }),
+  "pdf-form-filler": dynamic(() => import("./form-filler-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 
 export function EditorHost({ slug }: { slug: string }) {
