@@ -50,3 +50,4 @@ Local-first, privacy-first file toolkit. Everything runs in the browser: no back
 2. Done: layout revamp (header, card grid, themes), tools 7-10, 13, 16-20, Render Chains and presets.
 3. Done: tools 21-25, self-hosted model, Make offline-ready, HEIC, collage swap, SEO pages, privacy/about/how-it-works, accessibility and performance pass. See LAUNCH-CHECKLIST.md.
 4. Done: tools 26-35 (EXIF Remover, Signature Maker, PDF Page Numbers, Text Toolkit, Password, Barcode & QR Scanner, Blur & Redact, PH Pay Calculators, Document Scanner, Video Compressor & MP4 to GIF), new `code` and `video` categories.
+5. Done: video tools 36-42 (Video Trimmer, Video Speed, Video Crop & Rotate, Video Watermark, Video to MP3, Video Format Converter, Extract Frames).
