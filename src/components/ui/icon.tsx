@@ -11,6 +11,7 @@ import {
   FilePen,
   FileUser,
   FileOutput,
+  FileType,
   FileVideo,
   HandCoins,
   Hash,
@@ -85,6 +86,7 @@ const icons: Record<IconKey, LucideIcon> = {
   audio: Music,
   vconvert: FileVideo,
   frames: Images,
+  "txt-pdf": FileType,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

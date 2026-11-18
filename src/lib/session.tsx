@@ -91,7 +91,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
             continue;
           }
         }
-        if (detected.kind !== "image" && detected.kind !== "pdf") {
+        if (detected.kind !== "image" && detected.kind !== "pdf" && detected.kind !== "text" && detected.kind !== "archive") {
           problems.push(`"${name}": ${detected.unsupported ?? "This file type has no tools yet."}`);
           continue;
         }
@@ -111,7 +111,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       setFiles((current) => [...current, ...accepted]);
 
       // Fill in dimensions and page counts in the background.
-      for (const entry of accepted) {
+      // Text and ZIP files have no size or page count to show.
+      for (const entry of accepted.filter((item) => item.kind === "image" || item.kind === "pdf")) {
         probeFile(entry.kind === "pdf" ? "pdf" : "image", { name: entry.name, type: entry.mime, blob: entry.file }).then((info) => {
           setFiles((current) => current.map((f) => (f.id === entry.id ? { ...f, info } : f)));
         });

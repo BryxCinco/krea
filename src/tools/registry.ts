@@ -37,6 +37,7 @@ import { pdfToImage } from "./pdf/pdf-to-image";
 import { protectPdf } from "./pdf/protect-pdf";
 import { signPdf } from "./pdf/sign-pdf";
 import { split } from "./pdf/split";
+import { txtToPdf } from "./pdf/txt-to-pdf";
 import { watermarkPdf } from "./pdf/watermark-pdf";
 import { barcode } from "./text/barcode";
 import { invoice } from "./text/invoice";
@@ -97,6 +98,8 @@ export const tools: Tool[] = [
   videoAudio,
   videoConvert,
   videoFrames,
+  // Milestone 6 (43-50): PDF Plus
+  txtToPdf,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

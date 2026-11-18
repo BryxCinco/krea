@@ -150,7 +150,8 @@ export type IconKey =
   | "vwatermark"
   | "audio"
   | "vconvert"
-  | "frames";
+  | "frames"
+  | "txt-pdf";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
