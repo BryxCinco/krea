@@ -11,6 +11,7 @@ import {
   FilePen,
   FileUser,
   FileOutput,
+  FileVideo,
   HandCoins,
   Hash,
   IdCard,
@@ -81,6 +82,7 @@ const icons: Record<IconKey, LucideIcon> = {
   vcrop: Crop,
   vwatermark: Stamp,
   audio: Music,
+  vconvert: FileVideo,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {
