@@ -375,9 +375,9 @@ export function Timeline({
   );
 }
 
-/** Keep a video element's current time in state, for the timeline playhead. */
-export function usePlayhead() {
-  const player = useRef<HTMLVideoElement>(null);
+/** Keep a media element's current time in state, for the timeline playhead. Pass HTMLAudioElement for audio. */
+export function usePlayhead<T extends HTMLMediaElement = HTMLVideoElement>() {
+  const player = useRef<T>(null);
   const [time, setTime] = useState(0);
   useEffect(() => {
     const el = player.current;

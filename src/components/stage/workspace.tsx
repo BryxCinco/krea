@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Compare } from "@/components/ui/compare";
 import { CropBox } from "@/components/ui/crop-box";
 import { kindOfMime } from "@/lib/chains";
-import { formatBytes, IMAGE_MIMES, PDF_MIME } from "@/lib/file-type";
+import { CSV_MIME, formatBytes, IMAGE_MIMES, PDF_MIME, TEXT_MIME, TSV_MIME, ZIP_MIME } from "@/lib/file-type";
 import { useSession } from "@/lib/session";
 import { useFocusTrap } from "@/lib/use-focus-trap";
 import { useMediaQuery } from "@/lib/use-media-query";
@@ -49,7 +49,21 @@ const FORMAT_LABELS: Record<string, string> = {
   "image/png": "PNG",
   "image/webp": "WebP",
   [PDF_MIME]: "PDF",
+  [TEXT_MIME]: "TXT",
+  [CSV_MIME]: "CSV",
+  [TSV_MIME]: "TSV",
+  [ZIP_MIME]: "ZIP",
 };
+
+/** File-picker extensions per MIME type, since browsers disagree on text and ZIP types (Windows calls CSV application/vnd.ms-excel). */
+const PICKER_EXTENSIONS: Record<string, string[]> = {
+  [TEXT_MIME]: [".txt", ".md", ".log"],
+  [CSV_MIME]: [".csv"],
+  [TSV_MIME]: [".tsv"],
+  [ZIP_MIME]: [".zip"],
+};
+
+const ALL_MIMES = [...IMAGE_MIMES, PDF_MIME, TEXT_MIME, CSV_MIME, TSV_MIME, ZIP_MIME];
 
 const RAIL_WIDTH = 320;
 
@@ -246,8 +260,13 @@ export function Workspace({ lockedSlug }: { lockedSlug?: string }) {
     return () => window.removeEventListener(OPEN_CHAINS_EVENT, openChains);
   }, []);
 
-  const acceptList = lockedTool ? lockedTool.accepts : [...IMAGE_MIMES, PDF_MIME];
-  const formats = [...acceptList.map((mime) => FORMAT_LABELS[mime]), ...(acceptList.some((mime) => mime.startsWith("image/")) ? ["HEIC"] : [])].join(" · ");
+  const acceptList = lockedTool ? lockedTool.accepts : ALL_MIMES;
+  const formats = [...new Set([...acceptList.map((mime) => FORMAT_LABELS[mime]).filter(Boolean), ...(acceptList.some((mime) => mime.startsWith("image/")) ? ["HEIC"] : [])])].join(" · ");
+  const pickerAccept = [
+    ...acceptList,
+    ...acceptList.flatMap((mime) => PICKER_EXTENSIONS[mime] ?? []),
+    ...(acceptList.some((mime) => mime.startsWith("image/")) ? [".heic", ".heif", "image/heic", "image/heif", "image/avif"] : []),
+  ].join(",");
   const openPicker = () => inputRef.current?.click();
 
   // Chains need one kind of file on the Stage.
@@ -362,7 +381,7 @@ export function Workspace({ lockedSlug }: { lockedSlug?: string }) {
         ref={inputRef}
         type="file"
         multiple
-        accept={[...acceptList, ...(acceptList.some((mime) => mime.startsWith("image/")) ? [".heic", ".heif", "image/heic", "image/heif", "image/avif"] : [])].join(",")}
+        accept={pickerAccept}
         className="sr-only"
         tabIndex={-1}
         aria-hidden
@@ -470,7 +489,7 @@ export function Workspace({ lockedSlug }: { lockedSlug?: string }) {
               ) : (
                 <p className="flex items-start gap-2 text-sm leading-relaxed text-signal">
                   <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={1.75} />
-                  Walang Move na pwede sa lahat ng files na ito nang sabay. Images and PDFs need different Moves, so remove one kind.
+                  Walang Move na pwede sa lahat ng files na ito nang sabay. Images, PDFs, text and ZIP files need different Moves, so remove one kind.
                 </p>
               ))}
 

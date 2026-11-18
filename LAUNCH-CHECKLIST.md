@@ -54,6 +54,13 @@ These match published 2026 schedules from several payroll guides, but no agency 
 - [ ] Real loan offers (bank, Pag-IBIG, lending app) through the Loan tab: compare the monthly payment with the lender's disclosure statement.
 - [ ] Real phone videos (portrait, HDR, variable frame rate, 4K) through the Video Compressor; check audio sync in the result.
 - [ ] **Video Format Converter**: an iPhone MOV (H.264 and HEVC) to MP4 with Original quality (should copy, not re-encode), and an MP4 to WebM. Confirm the codec note matches the result.
+- [ ] **Redact PDF** on a real document with a TIN or account number: after download, select all text and search in Acrobat or Chrome; nothing under the boxes may be found, and the marked pages must be images.
+- [ ] **PDF Form Filler** on a real BIR, SSS or Pag-IBIG fillable form: values show in Acrobat, Chrome and Preview, with and without Lock answers.
+- [ ] **CSV to PDF** with an Excel CSV saved on Windows (semicolons, Windows-1252 accents, peso amounts) and a Google Sheets export.
+- [ ] **ZIP to PDF** with a phone's exported photo folder (HEIC is skipped, JPG/PNG kept) and a ZIP made on a Mac (__MACOSX ignored).
+- [ ] **Final Pay Calculator**: check three real cases with HR (resigned mid-year, redundancy after several years, under one year) and confirm FINAL_PAY rules in `src/config/ph-labor.ts` against DOLE LA 06-2020; then set VERIFICATION_STATUS.
+- [ ] **Audio Trimmer** on an iPhone voice memo (M4A), an Android recording and an MP3: Same as original must not re-encode; FLAC/ALAC in Safari and Firefox must show the cannot-decode message, not a broken file.
+- [ ] **Signature Extractor** with real phone photos (lamp light, shadow across the page, blue ballpen, lined paper); then place the saved signature in Sign PDF.
 - [ ] **Extract Frames**: every 1 s over a 1-minute 1080p clip as JPG (ZIP of about 60 images), and three picked moments as PNG. Check the frames match the player at those times.
 - [ ] Real PDFs from government portals and banks through Merge, Compress, Sign and Protect/Unlock; open the outputs in Adobe Reader, Chrome and a phone viewer.
 - [ ] Open a protected PDF made by Krea in Adobe Reader and confirm the password and print/copy restrictions behave.

@@ -1,5 +1,6 @@
 /** Maps the registry's string icon keys to lucide line icons, so workers never import React. */
 import {
+  AudioLines,
   Barcode,
   Calculator,
   Combine,
@@ -11,8 +12,11 @@ import {
   FilePen,
   FileUser,
   FileOutput,
+  FileSpreadsheet,
+  FileType,
   FileVideo,
   HandCoins,
+  Highlighter,
   Hash,
   IdCard,
   Images,
@@ -20,8 +24,11 @@ import {
   LayoutGrid,
   LockKeyhole,
   KeyRound,
+  Layers,
   Maximize2,
+  Package,
   Palette,
+  PenTool,
   Pilcrow,
   QrCode,
   ReceiptText,
@@ -29,6 +36,7 @@ import {
   Scaling,
   ScanLine,
   Clapperboard,
+  ClipboardPen,
   Scissors,
   Gauge,
   Music,
@@ -37,8 +45,10 @@ import {
   Signature,
   Split,
   SquareDashed,
+  SquareX,
   Stamp,
   Type,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 import type { IconKey } from "@/tools/types";
@@ -85,6 +95,17 @@ const icons: Record<IconKey, LucideIcon> = {
   audio: Music,
   vconvert: FileVideo,
   frames: Images,
+  "txt-pdf": FileType,
+  "csv-pdf": FileSpreadsheet,
+  pdfcrop: Crop,
+  flatten: Layers,
+  form: ClipboardPen,
+  "zip-pdf": Package,
+  annotate: Highlighter,
+  pdfredact: SquareX,
+  finalpay: Wallet,
+  audiotrim: AudioLines,
+  sigextract: PenTool,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

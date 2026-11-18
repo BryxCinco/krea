@@ -150,7 +150,18 @@ export type IconKey =
   | "vwatermark"
   | "audio"
   | "vconvert"
-  | "frames";
+  | "frames"
+  | "txt-pdf"
+  | "csv-pdf"
+  | "pdfcrop"
+  | "flatten"
+  | "form"
+  | "zip-pdf"
+  | "annotate"
+  | "pdfredact"
+  | "finalpay"
+  | "audiotrim"
+  | "sigextract";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
@@ -170,7 +181,7 @@ export interface Faq {
 }
 
 export interface Tool {
-  /** Stable number from the product spec (1-35). */
+  /** Stable number from the product spec (1-53). */
   id: number;
   /**
    * "file" (default): transforms files on the Stage, runs in a worker.

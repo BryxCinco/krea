@@ -5,6 +5,7 @@
  * Everything else (Moves on the Stage, the card grid, the Command Palette, the
  * /tools/[slug] route, Render Chains and the workers) reads from this list.
  */
+import { audioTrim } from "./image/audio-trim";
 import { collage } from "./image/collage";
 import { compress } from "./image/compress";
 import { convert } from "./image/convert";
@@ -15,6 +16,7 @@ import { palette } from "./image/palette";
 import { removeBackground } from "./image/remove-background";
 import { redact } from "./image/redact";
 import { resize } from "./image/resize";
+import { signatureExtract } from "./image/signature-extract";
 import { signatureMaker } from "./image/signature-maker";
 import { stripMetadataTool } from "./image/strip-metadata";
 import { upscale } from "./image/upscale";
@@ -27,7 +29,12 @@ import { videoFrames } from "./image/video-frames";
 import { videoTrim } from "./image/video-trim";
 import { videoWatermark } from "./image/video-watermark";
 import { watermark } from "./image/watermark";
+import { annotatePdf } from "./pdf/annotate";
 import { compressPdf } from "./pdf/compress-pdf";
+import { cropPdf } from "./pdf/crop-pdf";
+import { flattenPdf } from "./pdf/flatten-pdf";
+import { formFiller } from "./pdf/form-filler";
+import { csvToPdf } from "./pdf/csv-to-pdf";
 import { imageToPdf } from "./pdf/image-to-pdf";
 import { merge } from "./pdf/merge";
 import { ocr } from "./pdf/ocr";
@@ -35,10 +42,14 @@ import { organizePdf } from "./pdf/organize-pdf";
 import { pageNumbers } from "./pdf/page-numbers";
 import { pdfToImage } from "./pdf/pdf-to-image";
 import { protectPdf } from "./pdf/protect-pdf";
+import { redactPdf } from "./pdf/redact-pdf";
 import { signPdf } from "./pdf/sign-pdf";
 import { split } from "./pdf/split";
+import { txtToPdf } from "./pdf/txt-to-pdf";
 import { watermarkPdf } from "./pdf/watermark-pdf";
+import { zipToPdf } from "./pdf/zip-to-pdf";
 import { barcode } from "./text/barcode";
+import { finalPay } from "./text/final-pay";
 import { invoice } from "./text/invoice";
 import { markdown } from "./text/markdown";
 import { password } from "./text/password";
@@ -97,6 +108,19 @@ export const tools: Tool[] = [
   videoAudio,
   videoConvert,
   videoFrames,
+  // Milestone 6 (43-50): PDF Plus
+  txtToPdf,
+  csvToPdf,
+  cropPdf,
+  flattenPdf,
+  formFiller,
+  zipToPdf,
+  annotatePdf,
+  redactPdf,
+  // Milestone 7 (51-53)
+  finalPay,
+  audioTrim,
+  signatureExtract,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
@@ -104,7 +128,7 @@ export const categories: { id: ToolCategory; label: string }[] = [
   { id: "pdf", label: "PDF" },
   { id: "text", label: "Text & Docs" },
   { id: "code", label: "QR & Barcode" },
-  { id: "video", label: "Video" },
+  { id: "video", label: "Video & Audio" },
 ];
 
 export function getTool(slug: string): Tool | undefined {

@@ -3,8 +3,11 @@
  * or the browser-reported MIME type, which is often empty or wrong.
  */
 
-/** "convertible": a photo format Krea converts to JPEG when it arrives (HEIC, AVIF). */
-export type FileKind = "image" | "pdf" | "text" | "convertible" | "unknown";
+/**
+ * "convertible": a photo format Krea converts to JPEG when it arrives (HEIC, AVIF).
+ * "archive": a ZIP file (ZIP to PDF reads the images and PDFs inside).
+ */
+export type FileKind = "image" | "pdf" | "text" | "archive" | "convertible" | "unknown";
 
 export interface DetectedType {
   kind: FileKind;
@@ -17,6 +20,11 @@ export interface DetectedType {
 /** Image formats every tool can decode in a worker. */
 export const IMAGE_MIMES = ["image/jpeg", "image/png", "image/webp"];
 export const PDF_MIME = "application/pdf";
+/** Text MIME types are normalized from the extension, because browsers report CSV as many things (Windows says application/vnd.ms-excel). */
+export const TEXT_MIME = "text/plain";
+export const CSV_MIME = "text/csv";
+export const TSV_MIME = "text/tab-separated-values";
+export const ZIP_MIME = "application/zip";
 
 /** Hard ceiling so a stray multi-GB file fails fast with a clear message. */
 export const MAX_FILE_BYTES = 200 * 1024 * 1024;
@@ -52,9 +60,16 @@ export async function detectFileType(file: Blob, fileName = ""): Promise<Detecte
   }
 
   const name = fileName.toLowerCase();
-  if (file.type.startsWith("text/") || /\.(txt|md|markdown|csv)$/.test(name)) {
-    return { kind: "text", mime: file.type || "text/plain" };
+  // ZIP. Word, Excel and PowerPoint files are ZIPs too, so only real .zip files (or nameless pastes) count.
+  if (ascii(bytes, 0, 2) === "PK" && (startsWith(bytes, [0x03, 0x04], 2) || startsWith(bytes, [0x05, 0x06], 2))) {
+    if (/\.(docx|xlsx|pptx|odt|ods|odp|epub|jar|apk)$/.test(name)) {
+      return { kind: "unknown", mime: file.type || "", unsupported: "Office and other packaged files are not supported. Save it as PDF first." };
+    }
+    return { kind: "archive", mime: ZIP_MIME };
   }
+  if (/\.csv$/.test(name) || file.type === CSV_MIME) return { kind: "text", mime: CSV_MIME };
+  if (/\.(tsv|tab)$/.test(name) || file.type === TSV_MIME) return { kind: "text", mime: TSV_MIME };
+  if (file.type.startsWith("text/") || /\.(txt|md|markdown|log)$/.test(name)) return { kind: "text", mime: TEXT_MIME };
   return { kind: "unknown", mime: file.type || "", unsupported: "Hindi namin kilala ang file type na ito." };
 }
 
@@ -81,6 +96,14 @@ export function extensionFor(mime: string): string {
       return "webp";
     case PDF_MIME:
       return "pdf";
+    case TEXT_MIME:
+      return "txt";
+    case CSV_MIME:
+      return "csv";
+    case TSV_MIME:
+      return "tsv";
+    case ZIP_MIME:
+      return "zip";
     default:
       return "bin";
   }
