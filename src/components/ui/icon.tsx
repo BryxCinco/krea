@@ -15,6 +15,7 @@ import {
   FileType,
   FileVideo,
   HandCoins,
+  Highlighter,
   Hash,
   IdCard,
   Images,
@@ -96,6 +97,7 @@ const icons: Record<IconKey, LucideIcon> = {
   flatten: Layers,
   form: ClipboardPen,
   "zip-pdf": Package,
+  annotate: Highlighter,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

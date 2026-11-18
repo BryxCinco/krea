@@ -156,7 +156,8 @@ export type IconKey =
   | "pdfcrop"
   | "flatten"
   | "form"
-  | "zip-pdf";
+  | "zip-pdf"
+  | "annotate";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

@@ -27,6 +27,7 @@ import { videoFrames } from "./image/video-frames";
 import { videoTrim } from "./image/video-trim";
 import { videoWatermark } from "./image/video-watermark";
 import { watermark } from "./image/watermark";
+import { annotatePdf } from "./pdf/annotate";
 import { compressPdf } from "./pdf/compress-pdf";
 import { cropPdf } from "./pdf/crop-pdf";
 import { flattenPdf } from "./pdf/flatten-pdf";
@@ -110,6 +111,7 @@ export const tools: Tool[] = [
   flattenPdf,
   formFiller,
   zipToPdf,
+  annotatePdf,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
