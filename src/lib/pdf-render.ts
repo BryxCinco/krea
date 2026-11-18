@@ -52,6 +52,46 @@ export interface RenderedPage {
   reduced: boolean;
 }
 
+export interface RenderedCanvas {
+  canvas: HTMLCanvasElement;
+  /** Scale actually used (pixels per point); lower than asked when `reduced`. */
+  scale: number;
+  reduced: boolean;
+}
+
+/**
+ * Render one page (zero-based index) onto a fresh canvas, for callers that draw
+ * on it before encoding (Redact PDF). Release it with `canvas.width = 0` when done.
+ */
+export async function renderPageToCanvas(pdf: PDFDocumentProxy, pageIndex: number, scale: number): Promise<RenderedCanvas> {
+  const page = await pdf.getPage(pageIndex + 1);
+  try {
+    const base = page.getViewport({ scale: 1 });
+    const maxScale = Math.sqrt(MAX_RENDER_PIXELS / (base.width * base.height));
+    const reduced = scale > maxScale;
+    const used = Math.min(scale, maxScale);
+    const viewport = page.getViewport({ scale: used });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.ceil(viewport.width);
+    canvas.height = Math.ceil(viewport.height);
+    // White page background: PDFs are transparent by default and JPEG has no alpha.
+    await page.render({ canvas, viewport, background: "#ffffff" }).promise;
+    return { canvas, scale: used, reduced };
+  } finally {
+    page.cleanup();
+  }
+}
+
+/** Encode a rendered canvas and release it. */
+export async function encodeRendered(canvas: HTMLCanvasElement, pageIndex: number, mime: string, quality?: number): Promise<Blob> {
+  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, mime, quality));
+  // Shrinking the canvas releases its backing store right away instead of waiting for GC.
+  canvas.width = canvas.height = 0;
+  if (!blob) throw new KreaError("failed", `Page ${pageIndex + 1} could not be converted to an image.`);
+  return blob;
+}
+
 /** Render one page (zero-based index) to an image. `scale` 1 = 72 DPI. */
 export async function renderPage(
   pdf: PDFDocumentProxy,
@@ -60,26 +100,8 @@ export async function renderPage(
   mime: string,
   quality?: number,
 ): Promise<RenderedPage> {
-  const page = await pdf.getPage(pageIndex + 1);
-  try {
-    const base = page.getViewport({ scale: 1 });
-    const maxScale = Math.sqrt(MAX_RENDER_PIXELS / (base.width * base.height));
-    const reduced = scale > maxScale;
-    const viewport = page.getViewport({ scale: Math.min(scale, maxScale) });
-
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.ceil(viewport.width);
-    canvas.height = Math.ceil(viewport.height);
-    // White page background: PDFs are transparent by default and JPEG has no alpha.
-    await page.render({ canvas, viewport, background: "#ffffff" }).promise;
-
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, mime, quality));
-    const { width, height } = canvas;
-    // Shrinking the canvas releases its backing store right away instead of waiting for GC.
-    canvas.width = canvas.height = 0;
-    if (!blob) throw new KreaError("failed", `Page ${pageIndex + 1} could not be converted to an image.`);
-    return { blob, reduced, width, height };
-  } finally {
-    page.cleanup();
-  }
+  const { canvas, reduced } = await renderPageToCanvas(pdf, pageIndex, scale);
+  const { width, height } = canvas;
+  const blob = await encodeRendered(canvas, pageIndex, mime, quality);
+  return { blob, reduced, width, height };
 }

@@ -39,6 +39,7 @@ const editors = {
   "extract-frames": dynamic(() => import("./frames-editor"), { ssr: false, loading: EditorSkeleton }),
   "pdf-form-filler": dynamic(() => import("./form-filler-editor"), { ssr: false, loading: EditorSkeleton }),
   "pdf-annotator": dynamic(() => import("./annotate-editor"), { ssr: false, loading: EditorSkeleton }),
+  "redact-pdf": dynamic(() => import("./redact-pdf-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 
 export function EditorHost({ slug }: { slug: string }) {

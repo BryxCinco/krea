@@ -43,6 +43,7 @@ import {
   Signature,
   Split,
   SquareDashed,
+  SquareX,
   Stamp,
   Type,
   type LucideIcon,
@@ -98,6 +99,7 @@ const icons: Record<IconKey, LucideIcon> = {
   form: ClipboardPen,
   "zip-pdf": Package,
   annotate: Highlighter,
+  pdfredact: SquareX,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

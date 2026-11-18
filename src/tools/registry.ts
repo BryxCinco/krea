@@ -40,6 +40,7 @@ import { organizePdf } from "./pdf/organize-pdf";
 import { pageNumbers } from "./pdf/page-numbers";
 import { pdfToImage } from "./pdf/pdf-to-image";
 import { protectPdf } from "./pdf/protect-pdf";
+import { redactPdf } from "./pdf/redact-pdf";
 import { signPdf } from "./pdf/sign-pdf";
 import { split } from "./pdf/split";
 import { txtToPdf } from "./pdf/txt-to-pdf";
@@ -112,6 +113,7 @@ export const tools: Tool[] = [
   formFiller,
   zipToPdf,
   annotatePdf,
+  redactPdf,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
