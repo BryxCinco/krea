@@ -28,6 +28,7 @@ import { videoTrim } from "./image/video-trim";
 import { videoWatermark } from "./image/video-watermark";
 import { watermark } from "./image/watermark";
 import { compressPdf } from "./pdf/compress-pdf";
+import { csvToPdf } from "./pdf/csv-to-pdf";
 import { imageToPdf } from "./pdf/image-to-pdf";
 import { merge } from "./pdf/merge";
 import { ocr } from "./pdf/ocr";
@@ -100,6 +101,7 @@ export const tools: Tool[] = [
   videoFrames,
   // Milestone 6 (43-50): PDF Plus
   txtToPdf,
+  csvToPdf,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

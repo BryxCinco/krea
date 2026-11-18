@@ -58,6 +58,26 @@ export function decodeText(buffer: ArrayBuffer, name: string): string {
   return text.replace(/\r\n?/g, "\n");
 }
 
+/**
+ * Readable stand-ins for common symbols the standard fonts lack. The peso sign
+ * matters most: it is not in WinAnsi, and "?1,234.50" on a payslip is useless.
+ */
+const SUBSTITUTES: Record<string, string> = {
+  "₱": "PHP ",
+  "≥": ">=",
+  "≤": "<=",
+  "≠": "!=",
+  "→": "->",
+  "←": "<-",
+  "✓": "v",
+  "✔": "v",
+  "✗": "x",
+  "✘": "x",
+  "−": "-",
+  "‐": "-",
+  "‑": "-",
+};
+
 /** Makes strings printable with one font. `replaced` counts characters swapped for "?". */
 export function fontSanitizer(font: PDFFont) {
   const supported = new Set(font.getCharacterSet());
@@ -67,6 +87,7 @@ export function fontSanitizer(font: PDFFont) {
     for (const char of text.replace(/\t/g, "    ")) {
       const code = char.codePointAt(0) ?? 0;
       if (supported.has(code)) out += char;
+      else if (SUBSTITUTES[char]) out += SUBSTITUTES[char];
       else if (char === " " || char === " " || char === " ") out += " ";
       else if (code < 32) continue;
       else {

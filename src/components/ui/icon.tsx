@@ -11,6 +11,7 @@ import {
   FilePen,
   FileUser,
   FileOutput,
+  FileSpreadsheet,
   FileType,
   FileVideo,
   HandCoins,
@@ -87,6 +88,7 @@ const icons: Record<IconKey, LucideIcon> = {
   vconvert: FileVideo,
   frames: Images,
   "txt-pdf": FileType,
+  "csv-pdf": FileSpreadsheet,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

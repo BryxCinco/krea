@@ -151,7 +151,8 @@ export type IconKey =
   | "audio"
   | "vconvert"
   | "frames"
-  | "txt-pdf";
+  | "txt-pdf"
+  | "csv-pdf";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
