@@ -47,6 +47,7 @@ import { txtToPdf } from "./pdf/txt-to-pdf";
 import { watermarkPdf } from "./pdf/watermark-pdf";
 import { zipToPdf } from "./pdf/zip-to-pdf";
 import { barcode } from "./text/barcode";
+import { finalPay } from "./text/final-pay";
 import { invoice } from "./text/invoice";
 import { markdown } from "./text/markdown";
 import { password } from "./text/password";
@@ -114,6 +115,8 @@ export const tools: Tool[] = [
   zipToPdf,
   annotatePdf,
   redactPdf,
+  // Milestone 7 (51-53)
+  finalPay,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

@@ -40,6 +40,7 @@ const editors = {
   "pdf-form-filler": dynamic(() => import("./form-filler-editor"), { ssr: false, loading: EditorSkeleton }),
   "pdf-annotator": dynamic(() => import("./annotate-editor"), { ssr: false, loading: EditorSkeleton }),
   "redact-pdf": dynamic(() => import("./redact-pdf-editor"), { ssr: false, loading: EditorSkeleton }),
+  "ph-final-pay-calculator": dynamic(() => import("./final-pay-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 
 export function EditorHost({ slug }: { slug: string }) {

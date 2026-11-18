@@ -158,7 +158,8 @@ export type IconKey =
   | "form"
   | "zip-pdf"
   | "annotate"
-  | "pdfredact";
+  | "pdfredact"
+  | "finalpay";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

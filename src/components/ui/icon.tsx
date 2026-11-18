@@ -46,6 +46,7 @@ import {
   SquareX,
   Stamp,
   Type,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 import type { IconKey } from "@/tools/types";
@@ -100,6 +101,7 @@ const icons: Record<IconKey, LucideIcon> = {
   "zip-pdf": Package,
   annotate: Highlighter,
   pdfredact: SquareX,
+  finalpay: Wallet,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {
