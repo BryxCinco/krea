@@ -481,6 +481,120 @@ export async function watermarkVideo(file: Blob, info: VideoInfo, options: Water
   }
 }
 
+// ---------------------------------------------------------------- tool 40: extract audio
+
+export type AudioFormat = "mp3" | "m4a" | "wav";
+export const AUDIO_FORMATS: Record<AudioFormat, { ext: string; mime: string; label: string }> = {
+  mp3: { ext: "mp3", mime: "audio/mpeg", label: "MP3" },
+  m4a: { ext: "m4a", mime: "audio/mp4", label: "M4A (AAC)" },
+  wav: { ext: "wav", mime: "audio/wav", label: "WAV" },
+};
+
+export interface AudioOptions extends JobControl {
+  format: AudioFormat;
+  /** Bits per second for MP3 and M4A; 0 for M4A copies the original AAC without re-encoding. */
+  bitrate: number;
+  start: number;
+  end: number;
+}
+
+let mp3Registered = false;
+
+/**
+ * Save the audio track. MP3 uses LAME (LGPL) compiled to WebAssembly through @mediabunny/mp3-encoder,
+ * because browsers cannot encode MP3; it runs in its own inline worker, with no download. M4A uses the
+ * browser's AAC encoder (or copies the original AAC); WAV is uncompressed 16-bit PCM.
+ */
+export async function extractAudio(file: Blob, info: VideoInfo, options: AudioOptions): Promise<{ blob: Blob; copied: boolean }> {
+  if (!info.hasAudio) throw new KreaError("unsupported", "Walang audio ang video na ito, so there is nothing to extract.");
+  const range = trimRange(options.start, options.end, info.duration);
+  if (!range) throw new KreaError("failed", "Masyadong maikli ang napiling part. Pick at least 0.1 seconds.");
+  const spec = AUDIO_FORMATS[options.format];
+  const copy = options.format === "m4a" && options.bitrate === 0 && info.audioCodec === "aac";
+  const result = await runConversion(
+    file,
+    async (mb) => {
+      if (options.format === "mp3" && !mp3Registered && !(await mb.canEncodeAudio("mp3"))) {
+        const { registerMp3Encoder } = await import("@mediabunny/mp3-encoder");
+        registerMp3Encoder();
+        mp3Registered = true;
+      }
+      const format = options.format === "mp3" ? new mb.Mp3OutputFormat() : options.format === "wav" ? new mb.WavOutputFormat() : new mb.Mp4OutputFormat({ fastStart: "in-memory" });
+      if (copy) return { format, mime: spec.mime, options: { tracks: "primary", video: { discard: true }, trim: range, copy: { mode: "forced", boundaryPolicy: "expand" } } };
+      if (options.format === "m4a" && !(await mb.canEncodeAudio("aac"))) throw new KreaError("unsupported", "This browser cannot encode AAC. Choose MP3 or WAV.");
+      const codec = options.format === "mp3" ? "mp3" : options.format === "wav" ? "pcm-s16" : "aac";
+      return {
+        format,
+        mime: spec.mime,
+        options: { tracks: "primary", video: { discard: true }, audio: { codec, ...(options.format === "wav" ? {} : { bitrate: options.bitrate || 192_000 }), forceTranscode: true }, trim: range },
+      };
+    },
+    options,
+  );
+  return { blob: result.blob, copied: copy };
+}
+
+// ---------------------------------------------------------------- tool 41: format converter
+
+export interface ConvertOptions extends JobControl {
+  target: Container;
+  /** "copy" keeps the streams as they are when the target allows it (no quality loss). */
+  quality: "copy" | Preset;
+  /** Shorter-side cap; 0 keeps the size. Ignored for "copy". */
+  resolution: number;
+}
+export interface ConvertResult {
+  blob: Blob;
+  copied: boolean;
+  videoCodec: string;
+  audioCodec: string | null;
+  dropped: string[];
+}
+
+/**
+ * Change the container. With "copy", streams are moved into the new container untouched when its
+ * rules allow it (e.g. H.264 + AAC from MOV to MP4); otherwise, and for the presets, they are
+ * re-encoded with the target's codecs: MP4/MOV = H.264 + AAC, WebM = VP9 + Opus.
+ */
+export async function convertVideo(file: Blob, info: VideoInfo, options: ConvertOptions): Promise<ConvertResult> {
+  const spec = CONTAINERS[options.target];
+  if (options.quality === "copy") {
+    try {
+      const copied = await runConversion(
+        file,
+        async (mb) => ({ format: outputFormat(mb, options.target), mime: spec.mime, options: { tracks: "primary", copy: { mode: "forced" } } }),
+        options,
+      );
+      if (!copied.dropped.length) return { blob: copied.blob, copied: true, videoCodec: info.videoCodec ?? "?", audioCodec: info.audioCodec, dropped: [] };
+    } catch (error) {
+      if (options.signal.aborted) throw error;
+    }
+  }
+  let videoCodec = "";
+  let audioCodec: string | null = null;
+  const preset = options.quality === "copy" ? "better" : options.quality;
+  const result = await runConversion(
+    file,
+    async (mb) => {
+      const size = targetSize(info.width, info.height, options.quality === "copy" ? 0 : options.resolution);
+      videoCodec = await pickVideoCodec(mb, spec.video.filter((codec) => codec !== "hevc"), size.width, size.height);
+      audioCodec = info.hasAudio ? await mb.getFirstEncodableAudioCodec(spec.audio) : null;
+      const quality = preset === "small" ? mb.QUALITY_LOW : preset === "balanced" ? mb.QUALITY_MEDIUM : mb.QUALITY_HIGH;
+      return {
+        format: outputFormat(mb, options.target),
+        mime: spec.mime,
+        options: {
+          tracks: "primary",
+          video: { width: size.width, height: size.height, fit: "fill", codec: videoCodec as Mediabunny.VideoCodec, bitrate: quality, forceTranscode: true },
+          audio: audioCodec ? { codec: audioCodec as Mediabunny.AudioCodec, bitrate: preset === "small" ? 96_000 : 160_000, forceTranscode: true } : { discard: true },
+        },
+      };
+    },
+    options,
+  );
+  return { blob: result.blob, copied: false, videoCodec, audioCodec, dropped: result.dropped };
+}
+
 export function canvasPixels(canvas: HTMLCanvasElement | OffscreenCanvas): ImageData {
   const ctx = canvas.getContext("2d", { willReadFrequently: true }) as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
   return ctx.getImageData(0, 0, canvas.width, canvas.height);

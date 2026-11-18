@@ -21,6 +21,7 @@ import { upscale } from "./image/upscale";
 import { video } from "./image/video";
 import { videoSpeed } from "./image/video-speed";
 import { videoCrop } from "./image/video-crop";
+import { videoAudio } from "./image/video-audio";
 import { videoTrim } from "./image/video-trim";
 import { videoWatermark } from "./image/video-watermark";
 import { watermark } from "./image/watermark";
@@ -91,6 +92,7 @@ export const tools: Tool[] = [
   videoSpeed,
   videoCrop,
   videoWatermark,
+  videoAudio,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

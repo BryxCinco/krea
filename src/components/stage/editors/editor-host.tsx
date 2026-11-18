@@ -34,6 +34,7 @@ const editors = {
   "video-speed": dynamic(() => import("./speed-editor"), { ssr: false, loading: EditorSkeleton }),
   "video-crop-rotate": dynamic(() => import("./crop-video-editor"), { ssr: false, loading: EditorSkeleton }),
   "video-watermark": dynamic(() => import("./watermark-video-editor"), { ssr: false, loading: EditorSkeleton }),
+  "video-to-mp3": dynamic(() => import("./audio-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 
 export function EditorHost({ slug }: { slug: string }) {

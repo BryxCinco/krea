@@ -29,6 +29,7 @@ import {
   Clapperboard,
   Scissors,
   Gauge,
+  Music,
   ScanText,
   Shrink,
   Signature,
@@ -79,6 +80,7 @@ const icons: Record<IconKey, LucideIcon> = {
   speed: Gauge,
   vcrop: Crop,
   vwatermark: Stamp,
+  audio: Music,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {
