@@ -160,7 +160,8 @@ export type IconKey =
   | "annotate"
   | "pdfredact"
   | "finalpay"
-  | "audiotrim";
+  | "audiotrim"
+  | "sigextract";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

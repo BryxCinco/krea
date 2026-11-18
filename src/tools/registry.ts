@@ -16,6 +16,7 @@ import { palette } from "./image/palette";
 import { removeBackground } from "./image/remove-background";
 import { redact } from "./image/redact";
 import { resize } from "./image/resize";
+import { signatureExtract } from "./image/signature-extract";
 import { signatureMaker } from "./image/signature-maker";
 import { stripMetadataTool } from "./image/strip-metadata";
 import { upscale } from "./image/upscale";
@@ -119,6 +120,7 @@ export const tools: Tool[] = [
   // Milestone 7 (51-53)
   finalPay,
   audioTrim,
+  signatureExtract,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

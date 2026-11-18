@@ -28,6 +28,7 @@ import {
   Maximize2,
   Package,
   Palette,
+  PenTool,
   Pilcrow,
   QrCode,
   ReceiptText,
@@ -104,6 +105,7 @@ const icons: Record<IconKey, LucideIcon> = {
   pdfredact: SquareX,
   finalpay: Wallet,
   audiotrim: AudioLines,
+  sigextract: PenTool,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

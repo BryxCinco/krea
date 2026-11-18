@@ -41,6 +41,7 @@ const editors = {
   "pdf-annotator": dynamic(() => import("./annotate-editor"), { ssr: false, loading: EditorSkeleton }),
   "redact-pdf": dynamic(() => import("./redact-pdf-editor"), { ssr: false, loading: EditorSkeleton }),
   "audio-trimmer": dynamic(() => import("./audio-trim-editor"), { ssr: false, loading: EditorSkeleton }),
+  "signature-extractor": dynamic(() => import("./signature-extract-editor"), { ssr: false, loading: EditorSkeleton }),
   "ph-final-pay-calculator": dynamic(() => import("./final-pay-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 
