@@ -53,7 +53,9 @@ export const RESOLUTIONS = [
 export const GIF_WIDTHS = [240, 320, 480, 640] as const;
 export const GIF_FPS = [5, 10, 15] as const;
 export const GIF_MAX_SECONDS = 15;
-/** Refuse inputs over this size: the output is held in memory until it is saved. */
+/** Warn above this size: phones may run out of memory. */
+export const WARN_VIDEO_BYTES = 100 * 1024 * 1024;
+/** Refuse inputs over this size: the output is held in memory until it is saved. Set from tests (see LAUNCH-CHECKLIST). */
 export const MAX_VIDEO_BYTES = 2 * 1024 * 1024 * 1024;
 
 const even = (value: number) => Math.max(2, Math.round(value / 2) * 2);

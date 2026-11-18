@@ -30,6 +30,11 @@ const editors = {
   "ph-pay-calculators": dynamic(() => import("./ph-pay-editor"), { ssr: false, loading: EditorSkeleton }),
   "document-scanner": dynamic(() => import("./doc-scan-editor"), { ssr: false, loading: EditorSkeleton }),
   "video-compressor-gif": dynamic(() => import("./video-editor"), { ssr: false, loading: EditorSkeleton }),
+  "video-trimmer": dynamic(() => import("./trim-editor"), { ssr: false, loading: EditorSkeleton }),
+  "video-speed": dynamic(() => import("./speed-editor"), { ssr: false, loading: EditorSkeleton }),
+  "video-crop-rotate": dynamic(() => import("./crop-video-editor"), { ssr: false, loading: EditorSkeleton }),
+  "video-watermark": dynamic(() => import("./watermark-video-editor"), { ssr: false, loading: EditorSkeleton }),
+  "video-to-mp3": dynamic(() => import("./audio-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 
 export function EditorHost({ slug }: { slug: string }) {

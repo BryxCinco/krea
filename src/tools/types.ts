@@ -143,7 +143,12 @@ export type IconKey =
   | "redact"
   | "paycalc"
   | "scan"
-  | "video";
+  | "video"
+  | "trim"
+  | "speed"
+  | "vcrop"
+  | "vwatermark"
+  | "audio";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
