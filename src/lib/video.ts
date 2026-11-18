@@ -501,6 +501,14 @@ export interface AudioOptions extends JobControl {
 
 let mp3Registered = false;
 
+/** Browsers cannot encode MP3, so Krea registers LAME (LGPL, compiled to WebAssembly) once, on first use. */
+async function ensureMp3Encoder(mb: MB): Promise<void> {
+  if (mp3Registered || (await mb.canEncodeAudio("mp3"))) return;
+  const { registerMp3Encoder } = await import("@mediabunny/mp3-encoder");
+  registerMp3Encoder();
+  mp3Registered = true;
+}
+
 /**
  * Save the audio track. MP3 uses LAME (LGPL) compiled to WebAssembly through @mediabunny/mp3-encoder,
  * because browsers cannot encode MP3; it runs in its own inline worker, with no download. M4A uses the
@@ -515,11 +523,7 @@ export async function extractAudio(file: Blob, info: VideoInfo, options: AudioOp
   const result = await runConversion(
     file,
     async (mb) => {
-      if (options.format === "mp3" && !mp3Registered && !(await mb.canEncodeAudio("mp3"))) {
-        const { registerMp3Encoder } = await import("@mediabunny/mp3-encoder");
-        registerMp3Encoder();
-        mp3Registered = true;
-      }
+      if (options.format === "mp3") await ensureMp3Encoder(mb);
       const format = options.format === "mp3" ? new mb.Mp3OutputFormat() : options.format === "wav" ? new mb.WavOutputFormat() : new mb.Mp4OutputFormat({ fastStart: "in-memory" });
       if (copy) return { format, mime: spec.mime, options: { tracks: "primary", video: { discard: true }, trim: range, copy: { mode: "forced", boundaryPolicy: "expand" } } };
       if (options.format === "m4a" && !(await mb.canEncodeAudio("aac"))) throw new KreaError("unsupported", "This browser cannot encode AAC. Choose MP3 or WAV.");
@@ -533,6 +537,99 @@ export async function extractAudio(file: Blob, info: VideoInfo, options: AudioOp
     options,
   );
   return { blob: result.blob, copied: copy };
+}
+
+// ---------------------------------------------------------------- tool 52: audio trimmer and converter
+
+export interface AudioInfo {
+  duration: number;
+  codec: string | null;
+  sampleRate: number;
+  channels: number;
+  canDecode: boolean;
+}
+
+/** Read an audio file (MP3, WAV, M4A/AAC, OGG/Opus, FLAC, WebM, or a video's sound track). */
+export async function probeAudio(file: Blob): Promise<AudioInfo> {
+  const { input } = await openInput(file);
+  try {
+    const track = await input.getPrimaryAudioTrack().catch(() => null);
+    if (!track) throw new KreaError("unsupported", "Walang audio na nabasa sa file na ito. Use an MP3, WAV, M4A, OGG, FLAC or WebM audio file.");
+    return {
+      duration: await input.computeDuration(),
+      codec: track.codec,
+      sampleRate: track.sampleRate,
+      channels: track.numberOfChannels,
+      canDecode: await track.canDecode(),
+    };
+  } catch (error) {
+    if (error instanceof KreaError) throw error;
+    throw new KreaError("unsupported", "Hindi mabasa ang audio. Use an MP3, WAV, M4A, OGG, FLAC or WebM file.");
+  } finally {
+    input.dispose();
+  }
+}
+
+export type AudioOutput = "mp3" | "wav";
+export const AUDIO_OUTPUTS: Record<AudioOutput, { ext: string; mime: string; label: string }> = {
+  mp3: { ext: "mp3", mime: "audio/mpeg", label: "MP3" },
+  wav: { ext: "wav", mime: "audio/wav", label: "WAV" },
+};
+
+export interface AudioConvertOptions extends JobControl {
+  format: AudioOutput;
+  /** MP3 bits per second; 0 copies an MP3 input's frames without re-encoding. */
+  bitrate: number;
+  start: number;
+  end: number;
+  mono: boolean;
+}
+
+/**
+ * Trim and convert audio. MP3 to MP3 at "same as original" copies frames (cut at
+ * the nearest MP3 frame, about 26 ms, with no quality loss); everything else is
+ * decoded and re-encoded: MP3 with LAME, WAV as 16-bit PCM.
+ */
+export async function convertAudio(file: Blob, info: AudioInfo, options: AudioConvertOptions): Promise<{ blob: Blob; copied: boolean }> {
+  if (!info.canDecode) throw new KreaError("unsupported", `This browser cannot decode ${info.codec ?? "this"} audio. Try Chrome or Edge, or convert the file to MP3 or WAV with another app first.`);
+  const range = trimRange(options.start, options.end, info.duration);
+  if (!range) throw new KreaError("failed", "Masyadong maikli ang napiling part. Pick at least 0.1 seconds.");
+  const spec = AUDIO_OUTPUTS[options.format];
+  const attempt = (copy: boolean) =>
+    runConversion(
+      file,
+      async (mb) => {
+        const format = options.format === "mp3" ? new mb.Mp3OutputFormat() : new mb.WavOutputFormat();
+        // A cut that starts between MP3 frames shifts the audio by a few milliseconds. With a single
+        // track that cannot break sync, so any shift is allowed (Mediabunny allows none by default).
+        if (copy) return { format, mime: spec.mime, options: { tracks: "primary", video: { discard: true }, trim: range, copy: { mode: "forced", boundaryPolicy: "expand", shiftTolerance: Infinity } } };
+        if (options.format === "mp3") await ensureMp3Encoder(mb);
+        const codec = options.format === "mp3" ? "mp3" : "pcm-s16";
+        return {
+          format,
+          mime: spec.mime,
+          options: {
+            tracks: "primary",
+            video: { discard: true },
+            audio: { codec, ...(options.format === "mp3" ? { bitrate: options.bitrate || 192_000 } : {}), ...(options.mono ? { numberOfChannels: 1 } : {}), forceTranscode: true },
+            trim: range,
+          },
+        };
+      },
+      options,
+    );
+  if (options.format === "mp3" && options.bitrate === 0 && info.codec === "mp3" && !options.mono) {
+    try {
+      const copied = await attempt(true);
+      if (!copied.dropped.length) return { blob: copied.blob, copied: true };
+    } catch (error) {
+      if (options.signal.aborted) throw error;
+    }
+    // Copying failed (an unusual MP3): re-encode at a high bitrate instead of giving up.
+    options = { ...options, bitrate: 256_000 };
+  }
+  const result = await attempt(false);
+  return { blob: result.blob, copied: false };
 }
 
 // ---------------------------------------------------------------- tool 41: format converter

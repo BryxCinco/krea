@@ -159,7 +159,8 @@ export type IconKey =
   | "zip-pdf"
   | "annotate"
   | "pdfredact"
-  | "finalpay";
+  | "finalpay"
+  | "audiotrim";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

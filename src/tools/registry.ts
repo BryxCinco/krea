@@ -5,6 +5,7 @@
  * Everything else (Moves on the Stage, the card grid, the Command Palette, the
  * /tools/[slug] route, Render Chains and the workers) reads from this list.
  */
+import { audioTrim } from "./image/audio-trim";
 import { collage } from "./image/collage";
 import { compress } from "./image/compress";
 import { convert } from "./image/convert";
@@ -117,6 +118,7 @@ export const tools: Tool[] = [
   redactPdf,
   // Milestone 7 (51-53)
   finalPay,
+  audioTrim,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
@@ -124,7 +126,7 @@ export const categories: { id: ToolCategory; label: string }[] = [
   { id: "pdf", label: "PDF" },
   { id: "text", label: "Text & Docs" },
   { id: "code", label: "QR & Barcode" },
-  { id: "video", label: "Video" },
+  { id: "video", label: "Video & Audio" },
 ];
 
 export function getTool(slug: string): Tool | undefined {
