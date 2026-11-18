@@ -22,6 +22,7 @@ import {
   LayoutGrid,
   LockKeyhole,
   KeyRound,
+  Layers,
   Maximize2,
   Palette,
   Pilcrow,
@@ -90,6 +91,7 @@ const icons: Record<IconKey, LucideIcon> = {
   "txt-pdf": FileType,
   "csv-pdf": FileSpreadsheet,
   pdfcrop: Crop,
+  flatten: Layers,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

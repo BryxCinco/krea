@@ -29,6 +29,7 @@ import { videoWatermark } from "./image/video-watermark";
 import { watermark } from "./image/watermark";
 import { compressPdf } from "./pdf/compress-pdf";
 import { cropPdf } from "./pdf/crop-pdf";
+import { flattenPdf } from "./pdf/flatten-pdf";
 import { csvToPdf } from "./pdf/csv-to-pdf";
 import { imageToPdf } from "./pdf/image-to-pdf";
 import { merge } from "./pdf/merge";
@@ -104,6 +105,7 @@ export const tools: Tool[] = [
   txtToPdf,
   csvToPdf,
   cropPdf,
+  flattenPdf,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
