@@ -149,7 +149,7 @@ export function Workspace({ lockedSlug }: { lockedSlug?: string }) {
     jobRef.current?.cancel();
     const job = runSteps(
       steps,
-      files.map((file) => ({ name: file.name, type: file.mime, blob: file.file })),
+      files.map((file) => ({ name: file.name, type: file.mime, blob: file.file, sourceMetadata: file.sourceMetadata })),
       (progress) => {
         if (jobRef.current !== job) return;
         setRun((previous) => (previous?.key === runKey ? { ...previous, progress: progress.value, label: progress.label } : previous));

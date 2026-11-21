@@ -51,6 +51,7 @@ import { zipToPdf } from "./pdf/zip-to-pdf";
 import { barcode } from "./text/barcode";
 import { finalPay } from "./text/final-pay";
 import { invoice } from "./text/invoice";
+import { loan } from "./text/loan";
 import { markdown } from "./text/markdown";
 import { password } from "./text/password";
 import { payroll } from "./text/payroll";
@@ -121,6 +122,8 @@ export const tools: Tool[] = [
   finalPay,
   audioTrim,
   signatureExtract,
+  // Milestone 8 (54)
+  loan,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

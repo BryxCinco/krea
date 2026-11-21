@@ -11,11 +11,14 @@ export const MAX_CANVAS_PIXELS = 64_000_000;
 
 export type Canvas2D = OffscreenCanvasRenderingContext2D;
 
-/** Decode an image file, applying EXIF orientation. Throws clear errors for corrupt or oversized input. */
-export async function decodeImage(file: WorkFile): Promise<ImageBitmap> {
+/**
+ * Decode an image file, applying EXIF orientation. Throws clear errors for corrupt or oversized input.
+ * `orientation: "none"` ignores the rotation tag and keeps the pixels as stored.
+ */
+export async function decodeImage(file: WorkFile, orientation: "from-image" | "none" = "from-image"): Promise<ImageBitmap> {
   let bitmap: ImageBitmap;
   try {
-    bitmap = await createImageBitmap(file.blob, { imageOrientation: "from-image" });
+    bitmap = await createImageBitmap(file.blob, { imageOrientation: orientation });
   } catch {
     throw new KreaError("corrupted", `Hindi mabasa ang "${file.name}". The image may be corrupted or not a real image file.`);
   }

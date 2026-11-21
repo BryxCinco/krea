@@ -6,6 +6,7 @@
  * lazy-import their heavy libraries inside run(), so importing the registry on
  * the main thread stays cheap.
  */
+import type { MetadataReport } from "@/lib/image-metadata";
 
 export type ToolCategory = "image" | "pdf" | "text" | "code" | "video";
 
@@ -78,6 +79,11 @@ export interface WorkFile {
   name: string;
   type: string;
   blob: Blob;
+  /**
+   * Metadata of the original file when the Stage converted it on arrival (HEIC or AVIF to
+   * JPEG). Conversion drops it, so this is the only record of what the original carried.
+   */
+  sourceMetadata?: MetadataReport;
 }
 
 export interface PaletteColor {
@@ -161,7 +167,8 @@ export type IconKey =
   | "pdfredact"
   | "finalpay"
   | "audiotrim"
-  | "sigextract";
+  | "sigextract"
+  | "loan";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
@@ -181,7 +188,7 @@ export interface Faq {
 }
 
 export interface Tool {
-  /** Stable number from the product spec (1-53). */
+  /** Stable number from the product spec (1-54). */
   id: number;
   /**
    * "file" (default): transforms files on the Stage, runs in a worker.

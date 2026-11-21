@@ -14,7 +14,7 @@ const display = Bricolage_Grotesque({ variable: "--font-display", subsets: ["lat
 const code = JetBrains_Mono({ variable: "--font-code", subsets: ["latin"], display: "swap" });
 
 const DESCRIPTION =
-  "53 free tools for images, PDFs, documents, video and audio that run entirely in your browser: compress, convert, sign, fill, redact and protect files, scan documents, redact photos, make ID photos, resumes, invoices, QR codes and GIFs, and trim, convert or extract frames from videos. No uploads, no account, works offline.";
+  "54 free tools for images, PDFs, documents, video and audio that run entirely in your browser: compress, convert, sign, fill, redact and protect files, scan documents, redact photos, make ID photos, resumes, invoices, loan schedules, QR codes and GIFs, and trim, convert or extract frames from videos. No uploads, no account, works offline.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

@@ -24,6 +24,7 @@ import {
   LayoutGrid,
   LockKeyhole,
   KeyRound,
+  Landmark,
   Layers,
   Maximize2,
   Package,
@@ -106,6 +107,7 @@ const icons: Record<IconKey, LucideIcon> = {
   finalpay: Wallet,
   audiotrim: AudioLines,
   sigextract: PenTool,
+  loan: Landmark,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {
