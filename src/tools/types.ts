@@ -188,7 +188,7 @@ export interface Faq {
 }
 
 export interface Tool {
-  /** Stable number from the product spec (1-53). */
+  /** Stable number from the product spec (1-54). */
   id: number;
   /**
    * "file" (default): transforms files on the Stage, runs in a worker.

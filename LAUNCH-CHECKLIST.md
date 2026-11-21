@@ -60,6 +60,8 @@ These match published 2026 schedules from several payroll guides, but no agency 
 - [ ] **ZIP to PDF** with a phone's exported photo folder (HEIC is skipped, JPG/PNG kept) and a ZIP made on a Mac (__MACOSX ignored).
 - [ ] **Final Pay Calculator**: check three real cases with HR (resigned mid-year, redundancy after several years, under one year) and confirm FINAL_PAY rules in `src/config/ph-labor.ts` against DOLE LA 06-2020; then set VERIFICATION_STATUS.
 - [ ] **Audio Trimmer** on an iPhone voice memo (M4A), an Android recording and an MP3: Same as original must not re-encode; FLAC/ALAC in Safari and Firefox must show the cannot-decode message, not a broken file.
+- [ ] **Loan & Amortization Calculator**: compare a real bank or Pag-IBIG disclosure statement (diminishing) and a lending app offer (add-on); the monthly payment should match within rounding, apart from fees. Check that the CSV opens in Excel and Google Sheets.
+- [ ] **EXIF & Metadata Remover** with an iPhone HEIC photo that has location on (the report must show the original's GPS and camera) and a rotated JPG portrait (Keep photo upright on: upright and byte-identical pixels; off: sideways).
 - [ ] **Signature Extractor** with real phone photos (lamp light, shadow across the page, blue ballpen, lined paper); then place the saved signature in Sign PDF.
 - [ ] **Extract Frames**: every 1 s over a 1-minute 1080p clip as JPG (ZIP of about 60 images), and three picked moments as PNG. Check the frames match the player at those times.
 - [ ] Real PDFs from government portals and banks through Merge, Compress, Sign and Protect/Unlock; open the outputs in Adobe Reader, Chrome and a phone viewer.
