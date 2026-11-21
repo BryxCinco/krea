@@ -4,6 +4,7 @@
  * Worker-safe: no DOM, no dependencies.
  *
  * Supported: JPEG (segment removal), PNG (chunk removal), WebP (chunk removal).
+ * HEIC, HEIF and AVIF are read only (Krea converts them to JPEG on arrival).
  * Output is built from slices of the original bytes, so pixel data is untouched.
  */
 
@@ -22,6 +23,11 @@ export interface MetadataReport {
 export interface StripOptions {
   /** Keep the embedded colour profile (affects how colours look, holds no personal data). */
   keepProfile: boolean;
+  /**
+   * JPEG only: write back just this EXIF rotation value (2-8) so the photo stays upright
+   * without re-encoding. Everything else in EXIF is still removed.
+   */
+  keepOrientation?: number;
 }
 
 export interface StripResult {
@@ -241,6 +247,10 @@ function stripJpeg(bytes: Uint8Array, options: StripOptions): StripResult {
   const { segments } = jpegSegments(bytes);
   const parts: Uint8Array[] = [bytes.subarray(0, 2)];
   const removed = new Set<string>();
+  const orientation = options.keepOrientation && options.keepOrientation >= 2 && options.keepOrientation <= 8 ? orientationSegment(options.keepOrientation) : null;
+  // EXIF goes right after SOI, or after the JFIF header when there is one.
+  const afterJfif = segments[0]?.marker === 0xe0 && ascii(bytes, segments[0].start + 4, segments[0].start + 9) === "JFIF\0";
+  if (orientation && !afterJfif) parts.push(orientation);
   for (const seg of segments) {
     const body = seg.start + 4;
     let drop = false;
@@ -262,6 +272,7 @@ function stripJpeg(bytes: Uint8Array, options: StripOptions): StripResult {
       removed.add(seg.marker === 0xfe ? "comments" : seg.marker === 0xed ? "IPTC / Photoshop data" : "application data");
     }
     if (!drop) parts.push(bytes.subarray(seg.start, seg.end));
+    if (orientation && afterJfif && seg === segments[0]) parts.push(orientation);
   }
   parts.push(new Uint8Array([0xff, 0xd9]));
   return { blob: new Blob(parts as BlobPart[], { type: "image/jpeg" }), removed: [...removed] };
@@ -378,13 +389,153 @@ function stripWebp(bytes: Uint8Array, options: StripOptions): StripResult {
   return { blob: new Blob([header, ...parts] as BlobPart[], { type: "image/webp" }), removed: [...removed] };
 }
 
+// ---------------------------------------------------------------- HEIC / HEIF / AVIF (read only)
+
+/** ISO base media file ("ftyp" box first): HEIC, HEIF and AVIF photos. */
+export function isHeifBytes(bytes: Uint8Array) {
+  return ascii(bytes, 4, 8) === "ftyp";
+}
+
+interface Box {
+  type: string;
+  /** Start of the payload (after the size and type). */
+  body: number;
+  end: number;
+}
+
+function boxes(view: DataView, start: number, end: number): Box[] {
+  const list: Box[] = [];
+  let pos = start;
+  while (pos + 8 <= end && list.length < 512) {
+    let size = view.getUint32(pos);
+    const type = String.fromCharCode(view.getUint8(pos + 4), view.getUint8(pos + 5), view.getUint8(pos + 6), view.getUint8(pos + 7));
+    let body = pos + 8;
+    if (size === 1) {
+      if (pos + 16 > end) break;
+      size = Number(view.getBigUint64(pos + 8));
+      body = pos + 16;
+    } else if (size === 0) size = end - pos;
+    if (size < body - pos || pos + size > end) break;
+    list.push({ type, body, end: pos + size });
+    pos += size;
+  }
+  return list;
+}
+
+/**
+ * Reads the EXIF and XMP items of a HEIF file (the "meta" box: iinf lists the items,
+ * iloc says where their bytes are). Krea converts HEIC to JPEG on arrival, which drops
+ * all of this, so the Stage reads it from the original first to show what it carried.
+ */
+function readHeif(bytes: Uint8Array): MetadataReport {
+  const report = emptyReport();
+  try {
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const meta = boxes(view, 0, bytes.length).find((box) => box.type === "meta");
+    if (!meta) return report;
+    const children = boxes(view, meta.body + 4, meta.end); // meta is a full box: skip version and flags
+    const items = new Map<number, { type: string; contentType: string }>();
+    const iinf = children.find((box) => box.type === "iinf");
+    if (iinf) {
+      const version = view.getUint8(iinf.body);
+      for (const infe of boxes(view, iinf.body + 4 + (version === 0 ? 2 : 4), iinf.end)) {
+        if (infe.type !== "infe" || view.getUint8(infe.body) < 2) continue;
+        const v = view.getUint8(infe.body);
+        let at = infe.body + 4;
+        const id = v === 2 ? view.getUint16(at) : view.getUint32(at);
+        at += (v === 2 ? 2 : 4) + 2; // item_ID, item_protection_index
+        const type = ascii(bytes, at, at + 4);
+        at += 4;
+        while (at < infe.end && bytes[at] !== 0) at++; // item_name
+        const typeStart = at + 1;
+        let typeEnd = typeStart;
+        while (typeEnd < infe.end && bytes[typeEnd] !== 0) typeEnd++;
+        items.set(id, { type, contentType: type === "mime" ? ascii(bytes, typeStart, typeEnd) : "" });
+      }
+    }
+    const iloc = children.find((box) => box.type === "iloc");
+    const idat = children.find((box) => box.type === "idat");
+    if (!iloc) return report;
+    const version = view.getUint8(iloc.body);
+    let at = iloc.body + 4;
+    const sizes = view.getUint8(at);
+    const more = view.getUint8(at + 1);
+    at += 2;
+    const offsetSize = sizes >> 4;
+    const lengthSize = sizes & 15;
+    const baseSize = more >> 4;
+    const indexSize = version === 1 || version === 2 ? more & 15 : 0;
+    const uint = (size: number) => {
+      const value = size === 0 ? 0 : size === 2 ? view.getUint16(at) : size === 4 ? view.getUint32(at) : size === 8 ? Number(view.getBigUint64(at)) : NaN;
+      at += size;
+      return value;
+    };
+    const count = version < 2 ? uint(2) : uint(4);
+    for (let i = 0; i < Math.min(count, 4096) && at < iloc.end; i++) {
+      const id = version < 2 ? uint(2) : uint(4);
+      const method = version === 1 || version === 2 ? uint(2) & 15 : 0;
+      uint(2); // data_reference_index
+      const base = uint(baseSize);
+      const extents = uint(2);
+      const parts: [number, number][] = [];
+      for (let e = 0; e < extents; e++) {
+        uint(indexSize);
+        const offset = uint(offsetSize);
+        const length = uint(lengthSize);
+        parts.push([base + offset + (method === 1 && idat ? idat.body : 0), length]);
+      }
+      const item = items.get(id);
+      if (!item || method > 1) continue;
+      const total = parts.reduce((sum, [, length]) => sum + length, 0);
+      if (item.type === "Exif" && total > 8) {
+        // Join the extents, then skip the 4-byte header offset (and "Exif\0\0" when present).
+        const data = new Uint8Array(total);
+        let filled = 0;
+        for (const [offset, length] of parts) {
+          data.set(bytes.subarray(offset, offset + length), filled);
+          filled += length;
+        }
+        const skip = 4 + new DataView(data.buffer).getUint32(0);
+        withExif(report, parseTiff(data, skip, data.length));
+      } else if (item.type === "mime" && /xml|xmp/i.test(item.contentType)) {
+        report.containers.push(`XMP data (${kb(total)})`);
+      }
+    }
+  } catch {
+    // Damaged container: keep what was read.
+  }
+  return report;
+}
+
 // ---------------------------------------------------------------- public API
 
 export function readMetadata(bytes: Uint8Array): MetadataReport {
   if (isJpegBytes(bytes)) return readJpeg(bytes);
   if (isPngBytes(bytes)) return readPng(bytes);
   if (isWebpBytes(bytes)) return readWebp(bytes);
+  if (isHeifBytes(bytes)) return readHeif(bytes);
   return emptyReport();
+}
+
+/**
+ * A minimal EXIF block that holds only the rotation tag, so a cleaned JPEG still shows
+ * upright without re-encoding. It carries no camera, date or location data.
+ */
+function orientationSegment(orientation: number): Uint8Array {
+  const segment = new Uint8Array(36);
+  const view = new DataView(segment.buffer);
+  view.setUint16(0, 0xffe1);
+  view.setUint16(2, 34); // length, counting itself
+  segment.set([0x45, 0x78, 0x69, 0x66, 0, 0], 4); // "Exif\0\0"
+  segment.set([0x4d, 0x4d, 0x00, 0x2a], 10); // big-endian TIFF header
+  view.setUint32(14, 8); // IFD0 right after the header
+  view.setUint16(18, 1); // one entry
+  view.setUint16(20, 0x0112); // Orientation
+  view.setUint16(22, 3); // SHORT
+  view.setUint32(24, 1);
+  view.setUint16(28, orientation);
+  view.setUint32(32, 0); // no next IFD, so no thumbnail
+  return segment;
 }
 
 /** Strip metadata without touching pixels. Returns null when the format is not supported. */
@@ -404,6 +555,7 @@ export function hasAnyMetadata(report: MetadataReport) {
 export function describeMetadata(name: string, report: MetadataReport): string {
   if (!hasAnyMetadata(report)) return `${name}\n  No personal metadata found.`;
   const lines = [name];
+  if (report.hasGps) lines.push("  Warning: may GPS location. This photo shows where it was taken.");
   for (const [label, value] of report.rows) lines.push(`  ${label}: ${value}`);
   if (report.hasThumbnail) lines.push("  Embedded thumbnail: yes (can reveal the uncropped original)");
   for (const container of report.containers) lines.push(`  ${container}`);

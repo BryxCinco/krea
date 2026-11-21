@@ -8,6 +8,7 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { detectFileType, MAX_FILE_BYTES, type FileKind } from "@/lib/file-type";
 import { convertToJpeg } from "@/lib/heic";
+import { hasAnyMetadata, readMetadata, type MetadataReport } from "@/lib/image-metadata";
 import { probeFile, stopAllWorkers } from "@/lib/worker-client";
 import type { WorkFile } from "@/tools/types";
 import type { FileInfo } from "@/workers/runtime";
@@ -22,6 +23,8 @@ export interface StageFile {
   previewUrl?: string;
   /** Dimensions or page count, filled in asynchronously. */
   info?: FileInfo | null;
+  /** What a HEIC or AVIF photo carried before it was converted to JPEG (see WorkFile). */
+  sourceMetadata?: MetadataReport;
 }
 
 export interface RecentMove {
@@ -79,10 +82,14 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
           continue;
         }
         let detected = await detectFileType(blob, name);
+        let sourceMetadata: MetadataReport | undefined;
         if (detected.kind === "convertible") {
           // iPhone HEIC (and AVIF): convert to JPEG first, so every image tool can use it.
           setNotice(`Converting "${name}" to JPG…`);
           try {
+            // Conversion drops the metadata, so note what the original carried (for the EXIF tool).
+            const report = readMetadata(new Uint8Array(await blob.arrayBuffer()));
+            if (hasAnyMetadata(report)) sourceMetadata = report;
             ({ blob, name } = await convertToJpeg(blob, name, detected.mime));
             detected = { kind: "image", mime: "image/jpeg" };
             converted++;
@@ -102,6 +109,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
           kind: detected.kind,
           mime: detected.mime,
           previewUrl: detected.kind === "image" ? URL.createObjectURL(blob) : undefined,
+          sourceMetadata,
         });
       }
 
