@@ -173,7 +173,8 @@ export type IconKey =
   | "pdf-word"
   | "compare"
   | "quote"
-  | "tax";
+  | "tax"
+  | "markup";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

@@ -44,6 +44,7 @@ import {
   ClipboardPen,
   Scissors,
   Sheet,
+  SquarePen,
   Gauge,
   Music,
   ScanText,
@@ -118,6 +119,7 @@ const icons: Record<IconKey, LucideIcon> = {
   compare: FileDiff,
   quote: NotebookPen,
   tax: BadgePercent,
+  markup: SquarePen,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

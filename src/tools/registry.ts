@@ -5,6 +5,7 @@
  * Everything else (Moves on the Stage, the card grid, the Command Palette, the
  * /tools/[slug] route, Render Chains and the workers) reads from this list.
  */
+import { annotateImage } from "./image/annotate-image";
 import { audioTrim } from "./image/audio-trim";
 import { collage } from "./image/collage";
 import { compress } from "./image/compress";
@@ -134,6 +135,7 @@ export const tools: Tool[] = [
   comparePdf,
   quotation,
   freelancerTax,
+  annotateImage,
   excelToPdf,
 ];
 
