@@ -172,7 +172,8 @@ export type IconKey =
   | "excel-pdf"
   | "pdf-word"
   | "compare"
-  | "quote";
+  | "quote"
+  | "tax";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

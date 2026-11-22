@@ -53,6 +53,7 @@ import { watermarkPdf } from "./pdf/watermark-pdf";
 import { zipToPdf } from "./pdf/zip-to-pdf";
 import { barcode } from "./text/barcode";
 import { finalPay } from "./text/final-pay";
+import { freelancerTax } from "./text/freelancer-tax";
 import { invoice } from "./text/invoice";
 import { loan } from "./text/loan";
 import { markdown } from "./text/markdown";
@@ -132,6 +133,7 @@ export const tools: Tool[] = [
   pdfToWord,
   comparePdf,
   quotation,
+  freelancerTax,
   excelToPdf,
 ];
 

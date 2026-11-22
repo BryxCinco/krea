@@ -1,6 +1,7 @@
 /** Maps the registry's string icon keys to lucide line icons, so workers never import React. */
 import {
   AudioLines,
+  BadgePercent,
   Barcode,
   Calculator,
   Combine,
@@ -116,6 +117,7 @@ const icons: Record<IconKey, LucideIcon> = {
   "pdf-word": FileText,
   compare: FileDiff,
   quote: NotebookPen,
+  tax: BadgePercent,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {
