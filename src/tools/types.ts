@@ -169,7 +169,8 @@ export type IconKey =
   | "audiotrim"
   | "sigextract"
   | "loan"
-  | "excel-pdf";
+  | "excel-pdf"
+  | "pdf-word";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

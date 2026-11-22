@@ -13,6 +13,7 @@ import {
   FileUser,
   FileOutput,
   FileSpreadsheet,
+  FileText,
   FileType,
   FileVideo,
   HandCoins,
@@ -110,6 +111,7 @@ const icons: Record<IconKey, LucideIcon> = {
   sigextract: PenTool,
   loan: Landmark,
   "excel-pdf": Sheet,
+  "pdf-word": FileText,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

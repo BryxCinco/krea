@@ -42,6 +42,7 @@ import { ocr } from "./pdf/ocr";
 import { organizePdf } from "./pdf/organize-pdf";
 import { pageNumbers } from "./pdf/page-numbers";
 import { pdfToImage } from "./pdf/pdf-to-image";
+import { pdfToWord } from "./pdf/pdf-to-word";
 import { protectPdf } from "./pdf/protect-pdf";
 import { redactPdf } from "./pdf/redact-pdf";
 import { signPdf } from "./pdf/sign-pdf";
@@ -125,7 +126,8 @@ export const tools: Tool[] = [
   signatureExtract,
   // Milestone 8 (54)
   loan,
-  // Milestone 9 (55-60)
+  // Milestone 10 (55-60)
+  pdfToWord,
   excelToPdf,
 ];
 
