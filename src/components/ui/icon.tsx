@@ -46,6 +46,7 @@ import {
   Scissors,
   Shapes,
   Sheet,
+  Smartphone,
   SquarePen,
   Gauge,
   Music,
@@ -124,6 +125,7 @@ const icons: Record<IconKey, LucideIcon> = {
   markup: SquarePen,
   svg: FileCode,
   trace: Shapes,
+  heic: Smartphone,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

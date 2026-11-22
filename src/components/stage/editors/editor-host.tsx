@@ -48,6 +48,7 @@ const editors = {
   "freelancer-tax-calculator": dynamic(() => import("./freelancer-tax-editor"), { ssr: false, loading: EditorSkeleton }),
   "image-annotator": dynamic(() => import("./annotate-image-editor"), { ssr: false, loading: EditorSkeleton }),
   "svg-converter": dynamic(() => import("./svg-convert-editor"), { ssr: false, loading: EditorSkeleton }),
+  "heic-converter": dynamic(() => import("./heic-convert-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 
 export function EditorHost({ slug }: { slug: string }) {

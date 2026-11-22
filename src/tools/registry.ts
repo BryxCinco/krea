@@ -12,6 +12,7 @@ import { compress } from "./image/compress";
 import { convert } from "./image/convert";
 import { cropRotate } from "./image/crop-rotate";
 import { docScan } from "./image/doc-scan";
+import { heicConvert } from "./image/heic-convert";
 import { idPhoto } from "./image/id-photo";
 import { imageToSvg } from "./image/image-to-svg";
 import { palette } from "./image/palette";
@@ -142,6 +143,7 @@ export const tools: Tool[] = [
   // Milestone 11 (61-63): image conversions
   svgConvert,
   imageToSvg,
+  heicConvert,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
