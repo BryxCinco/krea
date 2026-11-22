@@ -39,6 +39,7 @@ import {
   Clapperboard,
   ClipboardPen,
   Scissors,
+  Sheet,
   Gauge,
   Music,
   ScanText,
@@ -108,6 +109,7 @@ const icons: Record<IconKey, LucideIcon> = {
   audiotrim: AudioLines,
   sigextract: PenTool,
   loan: Landmark,
+  "excel-pdf": Sheet,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

@@ -35,6 +35,7 @@ import { cropPdf } from "./pdf/crop-pdf";
 import { flattenPdf } from "./pdf/flatten-pdf";
 import { formFiller } from "./pdf/form-filler";
 import { csvToPdf } from "./pdf/csv-to-pdf";
+import { excelToPdf } from "./pdf/excel-to-pdf";
 import { imageToPdf } from "./pdf/image-to-pdf";
 import { merge } from "./pdf/merge";
 import { ocr } from "./pdf/ocr";
@@ -124,6 +125,8 @@ export const tools: Tool[] = [
   signatureExtract,
   // Milestone 8 (54)
   loan,
+  // Milestone 9 (55-60)
+  excelToPdf,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

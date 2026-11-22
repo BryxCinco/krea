@@ -25,6 +25,10 @@ export const TEXT_MIME = "text/plain";
 export const CSV_MIME = "text/csv";
 export const TSV_MIME = "text/tab-separated-values";
 export const ZIP_MIME = "application/zip";
+/** Excel workbooks. Counted as "text" files: tables to print, with no size or page count to probe. */
+export const XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+/** Word documents are only ever produced (PDF to Word), never opened. */
+export const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 /** Hard ceiling so a stray multi-GB file fails fast with a clear message. */
 export const MAX_FILE_BYTES = 200 * 1024 * 1024;
@@ -62,10 +66,14 @@ export async function detectFileType(file: Blob, fileName = ""): Promise<Detecte
   const name = fileName.toLowerCase();
   // ZIP. Word, Excel and PowerPoint files are ZIPs too, so only real .zip files (or nameless pastes) count.
   if (ascii(bytes, 0, 2) === "PK" && (startsWith(bytes, [0x03, 0x04], 2) || startsWith(bytes, [0x05, 0x06], 2))) {
-    if (/\.(docx|xlsx|pptx|odt|ods|odp|epub|jar|apk)$/.test(name)) {
+    if (/\.(xlsx|xlsm)$/.test(name)) return { kind: "text", mime: XLSX_MIME };
+    if (/\.(docx|pptx|odt|ods|odp|epub|jar|apk)$/.test(name)) {
       return { kind: "unknown", mime: file.type || "", unsupported: "Office and other packaged files are not supported. Save it as PDF first." };
     }
     return { kind: "archive", mime: ZIP_MIME };
+  }
+  if (/\.xls$/.test(name)) {
+    return { kind: "unknown", mime: file.type || "", unsupported: "Old .xls files are not supported. Save it as .xlsx or CSV in Excel first." };
   }
   if (/\.csv$/.test(name) || file.type === CSV_MIME) return { kind: "text", mime: CSV_MIME };
   if (/\.(tsv|tab)$/.test(name) || file.type === TSV_MIME) return { kind: "text", mime: TSV_MIME };
@@ -104,6 +112,10 @@ export function extensionFor(mime: string): string {
       return "tsv";
     case ZIP_MIME:
       return "zip";
+    case XLSX_MIME:
+      return "xlsx";
+    case DOCX_MIME:
+      return "docx";
     default:
       return "bin";
   }
