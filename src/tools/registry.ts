@@ -60,6 +60,7 @@ import { password } from "./text/password";
 import { payroll } from "./text/payroll";
 import { phPay } from "./text/ph-pay";
 import { qr } from "./text/qr";
+import { quotation } from "./text/quotation";
 import { resume } from "./text/resume";
 import { textToolkit } from "./text/text-toolkit";
 import type { Move, Tool, ToolCategory } from "./types";
@@ -130,6 +131,7 @@ export const tools: Tool[] = [
   // Milestone 10 (55-60)
   pdfToWord,
   comparePdf,
+  quotation,
   excelToPdf,
 ];
 

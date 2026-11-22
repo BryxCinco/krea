@@ -29,6 +29,7 @@ import {
   Landmark,
   Layers,
   Maximize2,
+  NotebookPen,
   Package,
   Palette,
   PenTool,
@@ -114,6 +115,7 @@ const icons: Record<IconKey, LucideIcon> = {
   "excel-pdf": Sheet,
   "pdf-word": FileText,
   compare: FileDiff,
+  quote: NotebookPen,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

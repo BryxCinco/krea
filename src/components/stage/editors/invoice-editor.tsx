@@ -8,7 +8,7 @@ import { replacedNote, safeStem } from "@/lib/pdf-text";
 import { printDocument } from "@/lib/print";
 import { useSession } from "@/lib/session";
 import { usePersistentState } from "@/lib/use-persistent-state";
-import { CURRENCIES, currencySymbol, formatMoney, invoiceDocument, invoiceTotals, newInvoice, type InvoiceData, type LineItem } from "@/tools/text/invoice";
+import { CURRENCIES, currencySymbol, DEFAULT_NOTES, DOC_LABELS, formatMoney, invoiceDocument, invoiceTotals, labelsFor, newInvoice, type DocKind, type InvoiceData, type LineItem } from "@/tools/text/invoice";
 import type { PdfLogo } from "@/tools/text/invoice-pdf";
 import { DocPreview } from "./doc-preview";
 import { ConfirmButton, Group, NumberInput, Segmented, TextArea, TextInput } from "./form";
@@ -17,10 +17,14 @@ import { EditorShell } from "./editor-shell";
 /** Logos are stored with the invoice in localStorage, so keep them small. */
 const MAX_LOGO_BYTES = 400 * 1024;
 
-function restore(stored: unknown): InvoiceData | null {
-  const data = stored as InvoiceData;
-  if (!data || typeof data !== "object" || !Array.isArray(data.items)) return null;
-  return { ...newInvoice(), ...data };
+/** Restore saved data, filling fields added since it was saved. `kinds` are the documents this editor makes. */
+function restorer(kinds: DocKind[]) {
+  return (stored: unknown): InvoiceData | null => {
+    const data = stored as InvoiceData;
+    if (!data || typeof data !== "object" || !Array.isArray(data.items)) return null;
+    const kind = kinds.includes(data.kind) ? data.kind : kinds[0];
+    return { ...newInvoice(kind), ...data, kind };
+  };
 }
 
 /** "INV-0007" -> "INV-0008": increments the trailing number, keeping its width. */
@@ -55,7 +59,17 @@ async function logoForPdf(dataUrl: string): Promise<PdfLogo | null> {
 }
 
 export default function InvoiceEditor() {
-  const { value: data, setValue: setData, saved, clear } = usePersistentState("krea.invoice", newInvoice, restore);
+  return <BillingEditor kinds={["invoice"]} storageKey="krea.invoice" label="Invoice generator" />;
+}
+
+/**
+ * The invoice editor, also used by Quotation & Receipt Maker (tool 57) with other document
+ * kinds. Each tool saves under its own key, so they never overwrite each other.
+ */
+export function BillingEditor({ kinds, storageKey, label }: { kinds: DocKind[]; storageKey: string; label: string }) {
+  const { value: data, setValue: setData, saved, clear } = usePersistentState(storageKey, () => newInvoice(kinds[0]), restorer(kinds));
+  const labels = labelsFor(data.kind);
+  const noun = data.kind === "receipt" ? "receipt" : labels.name.toLowerCase();
   const { setNotice } = useSession();
   const set = (patch: Partial<InvoiceData>) => setData((current) => ({ ...current, ...patch }));
   const setItem = (id: string, patch: Partial<LineItem>) => set({ items: data.items.map((item) => (item.id === id ? { ...item, ...patch } : item)) });
@@ -69,14 +83,14 @@ export default function InvoiceEditor() {
 
   const downloadPdf = async () => {
     if (!hasContent) {
-      setNotice("Walang laman ang invoice pa. Add at least one item with a description or rate.");
+      setNotice(`Walang laman ang ${noun} pa. Add at least one item with a description or rate.`);
       return;
     }
     setBusy(true);
     try {
       const [{ invoicePdf }, logo] = await Promise.all([import("@/tools/text/invoice-pdf"), data.logo ? logoForPdf(data.logo).catch(() => null) : Promise.resolve(null)]);
       const result = await invoicePdf(data, logo);
-      downloadBlob(new Blob([result.bytes as BlobPart], { type: "application/pdf" }), `${safeStem(`invoice-${data.number}`, "invoice")}.pdf`);
+      downloadBlob(new Blob([result.bytes as BlobPart], { type: "application/pdf" }), `${safeStem(`${labels.file}-${data.number}`, labels.file)}.pdf`);
       const logoNote = (data.logo && !logo) || result.logoSkipped ? " Hindi nabasa ang logo, so it was left out." : "";
       setNotice(`Na-download ang PDF.${logoNote}${replacedNote(result.replaced)}`);
     } catch (error) {
@@ -97,14 +111,42 @@ export default function InvoiceEditor() {
     reader.readAsDataURL(file);
   };
 
+  const switchKind = (kind: DocKind) => {
+    if (kind === data.kind) return;
+    const fresh = newInvoice(kind);
+    set({
+      kind,
+      // Swap the number's prefix (QUO-0003 to AR-0003) and untouched default notes; keep everything typed.
+      number: data.number.replace(/^(INV|QUO|AR)-/, `${DOC_LABELS[kind].prefix}-`),
+      notes: data.notes === DEFAULT_NOTES[data.kind] ? fresh.notes : data.notes,
+      dueDate: DOC_LABELS[kind].due ? data.dueDate || fresh.dueDate : "",
+      paymentMethod: data.paymentMethod || fresh.paymentMethod,
+    });
+  };
+
   const form = (
     <>
-      <Group title="Invoice">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <TextInput label="Invoice no." value={data.number} onChange={(number) => set({ number })} />
-          <TextInput label="Issue date" type="date" value={data.issueDate} onChange={(issueDate) => set({ issueDate })} />
-          <TextInput label="Due date" type="date" value={data.dueDate} onChange={(dueDate) => set({ dueDate })} />
+      {kinds.length > 1 && (
+        <Segmented label="Document" value={data.kind} onChange={switchKind} options={kinds.map((kind) => ({ value: kind, label: kind === "receipt" ? "Receipt" : DOC_LABELS[kind].name }))} />
+      )}
+      <Group title={labels.name}>
+        <div className={`grid gap-4 ${labels.due ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+          <TextInput label={labels.number} value={data.number} onChange={(number) => set({ number })} />
+          <TextInput label="Date" type="date" value={data.issueDate} onChange={(issueDate) => set({ issueDate })} />
+          {labels.due && <TextInput label={labels.due} type="date" value={data.dueDate} onChange={(dueDate) => set({ dueDate })} />}
         </div>
+        {data.kind === "receipt" && (
+          <TextInput label="Paid by" value={data.paymentMethod} onChange={(paymentMethod) => set({ paymentMethod })} placeholder="Cash, GCash ref. 1234, bank transfer" />
+        )}
+        {data.kind !== "invoice" && (
+          <TextInput
+            label={data.kind === "receipt" ? "Received by" : "Prepared by"}
+            value={data.signer}
+            onChange={(signer) => set({ signer })}
+            placeholder="Your name, printed above the signature line"
+            autoComplete="name"
+          />
+        )}
         <div>
           <label htmlFor={currencyId} className="mb-1.5 block text-sm text-fg">
             Currency
@@ -151,7 +193,7 @@ export default function InvoiceEditor() {
         <TextArea label="Address and contact" value={data.from.details} onChange={(details) => set({ from: { ...data.from, details } })} rows={3} placeholder={"Makati City\nhello@example.ph · 0917 000 0000\nTIN 000-000-000-000"} />
       </Group>
 
-      <Group title="Bill to">
+      <Group title={labels.party}>
         <TextInput label="Client name" value={data.to.name} onChange={(name) => set({ to: { ...data.to, name } })} />
         <TextArea label="Client address and contact" value={data.to.details} onChange={(details) => set({ to: { ...data.to, details } })} rows={3} />
       </Group>
@@ -217,20 +259,22 @@ export default function InvoiceEditor() {
               <dd className="text-right text-fg">{money(totals.tax)}</dd>
             </>
           )}
-          <dt className="font-semibold text-fg">Total</dt>
+          <dt className="font-semibold text-fg">{labels.total}</dt>
           <dd className="text-right font-semibold text-accent">{money(totals.total)}</dd>
         </dl>
       </Group>
 
-      <Group title="Payment details">
-        <TextArea
-          label="How to pay you"
-          value={data.payment}
-          onChange={(payment) => set({ payment })}
-          rows={3}
-          placeholder={"GCash 0917 000 0000 (Juan D.)\nBDO Savings 0000 0000 0000, Juan Dela Cruz"}
-        />
-      </Group>
+      {data.kind !== "receipt" && (
+        <Group title="Payment details">
+          <TextArea
+            label="How to pay you"
+            value={data.payment}
+            onChange={(payment) => set({ payment })}
+            rows={3}
+            placeholder={"GCash 0917 000 0000 (Juan D.)\nBDO Savings 0000 0000 0000, Juan Dela Cruz"}
+          />
+        </Group>
+      )}
 
       <Group title="Notes and paper">
         <TextArea label="Notes" value={data.notes} onChange={(notes) => set({ notes })} rows={3} placeholder="Thank you note, terms or late payment policy" />
@@ -254,7 +298,12 @@ export default function InvoiceEditor() {
           Gabay lang ito, hindi opisyal na resibo
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          This invoice is for billing your clients. It is not an official receipt. Kung BIR-registered ang negosyo mo, you must issue the official receipts or invoices registered with the BIR.
+          {data.kind === "quotation"
+            ? "A quotation is an offer of prices, not a bill or a receipt."
+            : data.kind === "receipt"
+              ? "An acknowledgement receipt confirms a payment between you and your client, and each one says it is not a BIR official receipt."
+              : "This invoice is for billing your clients. It is not an official receipt."}{" "}
+          Kung BIR-registered ang negosyo mo, you must issue the official receipts or invoices registered with the BIR.
         </p>
       </section>
     </>
@@ -272,14 +321,14 @@ export default function InvoiceEditor() {
       </Button>
       <Button
         onClick={() => {
-          // Next invoice for the same sender: keep "From", logo, currency, tax, payment details and notes; clear client and items.
-          const fresh = newInvoice();
+          // Next document for the same sender: keep "From", logo, currency, tax, payment details and notes; clear client and items.
+          const fresh = newInvoice(data.kind);
           set({ number: nextNumber(data.number), issueDate: fresh.issueDate, dueDate: fresh.dueDate, to: fresh.to, items: fresh.items, discount: 0 });
-          setNotice(`Bagong invoice: ${nextNumber(data.number)}. Your details and logo are kept.`);
+          setNotice(`Bagong ${noun}: ${nextNumber(data.number)}. Your details and logo are kept.`);
         }}
       >
         <Plus aria-hidden className="size-4" strokeWidth={1.75} />
-        Next invoice
+        Next {noun}
       </Button>
       <ConfirmButton
         label={
@@ -288,11 +337,11 @@ export default function InvoiceEditor() {
             Clear data
           </>
         }
-        confirmLabel="Delete all invoice data?"
-        onConfirm={() => clear(newInvoice())}
+        confirmLabel={`Delete all ${kinds.length > 1 ? "quotation and receipt" : "invoice"} data?`}
+        onConfirm={() => clear(newInvoice(kinds[0]))}
       />
     </>
   );
 
-  return <EditorShell label="Invoice generator" form={form} preview={<DocPreview html={html} title="Invoice preview" />} actions={actions} saved={saved} />;
+  return <EditorShell label={label} form={form} preview={<DocPreview html={html} title={`${labels.name} preview`} />} actions={actions} saved={saved} />;
 }

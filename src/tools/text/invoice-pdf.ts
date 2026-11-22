@@ -1,6 +1,8 @@
 /**
- * Invoice Generator (tool 23): the invoice as a real PDF with selectable text, built with
- * pdf-lib's standard fonts. Loaded only when Download PDF is pressed (pdf-lib is imported
+ * Invoice Generator (23) and Quotation & Receipt Maker (57): the document as a real PDF
+ * with selectable text, built with pdf-lib's standard fonts. Quotations add Prepared by and
+ * Conforme lines; receipts add Received by and the not-an-official-receipt note.
+ * Loaded only when Download PDF is pressed (pdf-lib is imported
  * inside the function). Standard fonts are WinAnsi only, so every string goes through
  * fontSanitizer: the peso sign prints as "PHP", and a currency whose symbol the font lacks
  * (won, for example) is written with its code instead ("KRW 1,000").
@@ -8,7 +10,7 @@
 import type { PDFFont, PDFImage, PDFPage } from "pdf-lib";
 import { fontSanitizer, PAGE_SIZES, wrapLine } from "@/lib/pdf-text";
 import { KreaError } from "../types";
-import { formatMoney, invoiceTotals, type InvoiceData } from "./invoice";
+import { formatMoney, invoiceTotals, labelsFor, RECEIPT_DISCLAIMER, type InvoiceData } from "./invoice";
 
 export interface PdfLogo {
   bytes: Uint8Array;
@@ -39,8 +41,9 @@ export async function invoicePdf(data: InvoiceData, logo: PdfLogo | null): Promi
   const accent = rgb(0.176, 0.227, 0.063);
   const rule = rgb(0.89, 0.89, 0.9);
 
+  const labels = labelsFor(data.kind);
   const pdf = await PDFDocument.create();
-  pdf.setTitle(`Invoice ${data.number}`.trim());
+  pdf.setTitle(`${labels.name} ${data.number}`.trim());
   pdf.setProducer("Krea");
   pdf.setCreator("Krea");
   const regular = await pdf.embedFont(StandardFonts.Helvetica);
@@ -112,12 +115,15 @@ export async function invoicePdf(data: InvoiceData, logo: PdfLogo | null): Promi
   }
 
   let top = y;
-  drawRight("INVOICE", right, top - 24, 24, bold, accent);
-  top -= 40;
+  // Long titles (ACKNOWLEDGEMENT RECEIPT) shrink to stay in the right half.
+  const titleSize = Math.min(24, (contentWidth * 0.48) / bold.widthOfTextAtSize(labels.title, 1));
+  drawRight(labels.title, right, top - titleSize, titleSize, bold, accent);
+  top -= titleSize + 16;
   const meta: [string, string][] = [
-    ["Invoice no.", data.number],
+    [labels.number, data.number],
     ["Date", longDate(data.issueDate)],
-    ...(data.dueDate ? ([["Due", longDate(data.dueDate)]] as [string, string][]) : []),
+    ...(labels.due && data.dueDate ? ([[labels.due, longDate(data.dueDate)]] as [string, string][]) : []),
+    ...(data.kind === "receipt" && data.paymentMethod.trim() ? ([["Paid by", data.paymentMethod]] as [string, string][]) : []),
   ];
   for (const [label, value] of meta) {
     top -= 14;
@@ -127,7 +133,7 @@ export async function invoicePdf(data: InvoiceData, logo: PdfLogo | null): Promi
   y = Math.min(left, top) - 30;
 
   // ---------------------------------------------------------------- bill to
-  draw("BILL TO", MARGIN, y, 8, bold, muted);
+  draw(labels.party.toUpperCase(), MARGIN, y, 8, bold, muted);
   y -= 16;
   draw(data.to.name || "Client name", MARGIN, y, 12, bold, data.to.name ? ink : muted);
   for (const text of wrap(data.to.details, regular, 9.5, leftWidth)) {
@@ -185,7 +191,7 @@ export async function invoicePdf(data: InvoiceData, logo: PdfLogo | null): Promi
   y += 6;
   line(labelX, right, y, 1.5, accent);
   y -= 18;
-  draw("Total", labelX, y, 13, bold);
+  draw(labels.total, labelX, y, 13, bold);
   drawRight(money(totals.total), right, y, 13, bold, accent);
   y -= 34;
 
@@ -202,12 +208,36 @@ export async function invoicePdf(data: InvoiceData, logo: PdfLogo | null): Promi
     }
     y -= 14;
   };
-  block("PAYMENT DETAILS", data.payment);
+  if (data.kind !== "receipt") block("PAYMENT DETAILS", data.payment);
   block("NOTES", data.notes);
+
+  // ---------------------------------------------------------------- signature lines (quotation, receipt)
+  if (data.kind === "quotation" || data.kind === "receipt") {
+    room(80);
+    y -= 30;
+    const columnWidth = (contentWidth - 40) / 2;
+    const signLine = (x: number, name: string, caption: string) => {
+      if (name.trim()) draw(name, x, y + 6, 10.5, bold);
+      line(x, x + columnWidth, y, 0.8, ink);
+      for (const [i, text] of wrap(caption, regular, 8.5, columnWidth).entries()) draw(text, x, y - 12 - i * 11, 8.5, regular, muted);
+    };
+    if (data.kind === "quotation") {
+      signLine(MARGIN, data.signer, "Prepared by");
+      signLine(MARGIN + columnWidth + 40, "", `Conforme: ${data.to.name.trim() || "client"} (signature over printed name and date)`);
+    } else {
+      signLine(MARGIN + columnWidth + 40, data.signer, "Received by (signature over printed name)");
+    }
+    y -= 48;
+  }
+  if (data.kind === "receipt") {
+    room(20);
+    const text = clean(regular, RECEIPT_DISCLAIMER);
+    page.drawText(text, { x: (width - regular.widthOfTextAtSize(text, 8.5)) / 2, y, size: 8.5, font: regular, color: muted });
+  }
 
   // ---------------------------------------------------------------- footer on every page
   pages.forEach((entry, index) => {
-    const footer = clean(regular, `${data.number ? `Invoice ${data.number} · ` : ""}Page ${index + 1} of ${pages.length}`);
+    const footer = clean(regular, `${data.number ? `${labels.name} ${data.number} · ` : ""}Page ${index + 1} of ${pages.length}`);
     entry.drawText(footer, { x: (width - regular.widthOfTextAtSize(footer, 8)) / 2, y: MARGIN - 20, size: 8, font: regular, color: muted });
   });
 

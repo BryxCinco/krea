@@ -41,7 +41,42 @@ export interface LineItem {
   rate: number;
 }
 
+/** The billing documents the invoice editor makes. Quotation and receipt belong to tool 57. */
+export type DocKind = "invoice" | "quotation" | "receipt";
+
+export interface DocLabels {
+  name: string;
+  title: string;
+  number: string;
+  /** Label of the second date, or null when the document has none. */
+  due: string | null;
+  party: string;
+  total: string;
+  prefix: string;
+  /** File name stem for downloads. */
+  file: string;
+}
+
+export const DOC_LABELS: Record<DocKind, DocLabels> = {
+  invoice: { name: "Invoice", title: "INVOICE", number: "Invoice no.", due: "Due", party: "Bill to", total: "Total", prefix: "INV", file: "invoice" },
+  quotation: { name: "Quotation", title: "QUOTATION", number: "Quote no.", due: "Valid until", party: "Prepared for", total: "Total", prefix: "QUO", file: "quotation" },
+  receipt: { name: "Acknowledgement receipt", title: "ACKNOWLEDGEMENT RECEIPT", number: "Receipt no.", due: null, party: "Received from", total: "Amount received", prefix: "AR", file: "receipt" },
+};
+
+export const DEFAULT_NOTES: Record<DocKind, string> = {
+  invoice: "Salamat po!",
+  quotation: "Prices are valid until the date above. 50% down payment to start, balance upon completion.",
+  receipt: "Salamat po sa bayad!",
+};
+
+/** Printed at the bottom of every acknowledgement receipt. */
+export const RECEIPT_DISCLAIMER = "This acknowledgement receipt is not a BIR-registered invoice or official receipt.";
+
+/** Labels for a document, falling back to the invoice for unknown data. */
+export const labelsFor = (kind: DocKind | undefined): DocLabels => DOC_LABELS[kind ?? "invoice"] ?? DOC_LABELS.invoice;
+
 export interface InvoiceData {
+  kind: DocKind;
   number: string;
   issueDate: string;
   dueDate: string;
@@ -54,8 +89,12 @@ export interface InvoiceData {
   discountMode: "amount" | "percent";
   discount: number;
   notes: string;
-  /** How to pay: bank account, GCash or Maya number. */
+  /** How to pay: bank account, GCash or Maya number. Not shown on receipts. */
   payment: string;
+  /** How the client paid (receipts only), e.g. "GCash, ref. 1234". */
+  paymentMethod: string;
+  /** Who signs: "Prepared by" on a quotation, "Received by" on a receipt. */
+  signer: string;
   /** ISO 4217 code, e.g. "PHP". */
   currency: string;
   /** Logo as a data URL, "" when none. */
@@ -150,11 +189,12 @@ export function todayIso(offsetDays = 0): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
-export function newInvoice(): InvoiceData {
+export function newInvoice(kind: DocKind = "invoice"): InvoiceData {
   return {
-    number: "INV-0001",
+    kind,
+    number: `${DOC_LABELS[kind].prefix}-0001`,
     issueDate: todayIso(),
-    dueDate: todayIso(15),
+    dueDate: kind === "receipt" ? "" : todayIso(kind === "quotation" ? 30 : 15),
     from: { name: "", details: "" },
     to: { name: "", details: "" },
     items: [{ id: "item-1", description: "", quantity: 1, rate: 0 }],
@@ -162,8 +202,10 @@ export function newInvoice(): InvoiceData {
     taxLabel: "VAT",
     discountMode: "amount",
     discount: 0,
-    notes: "Salamat po!",
+    notes: DEFAULT_NOTES[kind],
     payment: "",
+    paymentMethod: kind === "receipt" ? "Cash" : "",
+    signer: "",
     currency: "PHP",
     logo: "",
     paper: "a4",
@@ -192,10 +234,15 @@ const CSS = `
 .inv .totals .grand { border-top: 2px solid #2d3a10; margin-top: 6px; padding-top: 10px; font-size: 18px; font-weight: 700; }
 .inv .notes { margin-top: 32px; color: #3f4046; white-space: pre-line; }
 .inv .empty { color: #8a8b93; }
+.inv .signs { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 56px; break-inside: avoid; }
+.inv .sign { border-top: 1px solid #16171a; padding-top: 6px; font-size: 12px; color: #3f4046; }
+.inv .sign strong { display: block; color: #16171a; font-size: 13px; }
+.inv .disclaimer { margin-top: 28px; font-size: 11px; color: #5b5d66; text-align: center; }
 `;
 
-/** The invoice as a standalone HTML document (preview and print). */
+/** The invoice, quotation or receipt as a standalone HTML document (preview and print). */
 export function invoiceDocument(data: InvoiceData): string {
+  const labels = labelsFor(data.kind);
   const totals = invoiceTotals(data);
   const money = (value: number) => formatMoney(value, data.currency);
   const logo = safeImageSrc(data.logo);
@@ -219,17 +266,18 @@ export function invoiceDocument(data: InvoiceData): string {
       <div>${multiline(data.from.details)}</div>
     </div>
     <div class="meta">
-      <h1>INVOICE</h1>
+      <h1>${labels.title}</h1>
       <dl>
-        <dt>Invoice no.</dt><dd>${esc(data.number)}</dd>
+        <dt>${labels.number}</dt><dd>${esc(data.number)}</dd>
         <dt>Date</dt><dd>${esc(longDate(data.issueDate))}</dd>
-        ${data.dueDate ? `<dt>Due</dt><dd>${esc(longDate(data.dueDate))}</dd>` : ""}
+        ${labels.due && data.dueDate ? `<dt>${labels.due}</dt><dd>${esc(longDate(data.dueDate))}</dd>` : ""}
+        ${data.kind === "receipt" && data.paymentMethod.trim() ? `<dt>Paid by</dt><dd>${esc(data.paymentMethod)}</dd>` : ""}
       </dl>
     </div>
   </header>
   <section class="parties">
     <div>
-      <div class="label">Bill to</div>
+      <div class="label">${labels.party}</div>
       <div class="name">${esc(data.to.name) || '<span class="empty">Client name</span>'}</div>
       <div>${multiline(data.to.details)}</div>
     </div>
@@ -242,10 +290,22 @@ export function invoiceDocument(data: InvoiceData): string {
     <div><span>Subtotal</span><span>${money(totals.subtotal)}</span></div>
     ${totals.discount ? `<div><span>${discountLabel}</span><span>-${money(totals.discount)}</span></div>` : ""}
     ${num(data.taxRate) ? `<div><span>${esc(data.taxLabel || "Tax")} (${esc(num(data.taxRate))}%)</span><span>${money(totals.tax)}</span></div>` : ""}
-    <div class="grand"><span>Total</span><span>${money(totals.total)}</span></div>
+    <div class="grand"><span>${labels.total}</span><span>${money(totals.total)}</span></div>
   </div>
-  ${data.payment.trim() ? `<div class="notes"><div class="label">Payment details</div>${esc(data.payment)}</div>` : ""}
+  ${data.kind !== "receipt" && data.payment.trim() ? `<div class="notes"><div class="label">Payment details</div>${esc(data.payment)}</div>` : ""}
   ${data.notes.trim() ? `<div class="notes">${esc(data.notes)}</div>` : ""}
+  ${signatures(data)}
+  ${data.kind === "receipt" ? `<p class="disclaimer">${RECEIPT_DISCLAIMER}</p>` : ""}
 </div>`;
-  return htmlDocument({ title: `Invoice ${data.number}`, css: CSS, body, paper: data.paper });
+  return htmlDocument({ title: `${labels.name} ${data.number}`, css: CSS, body, paper: data.paper });
+}
+
+/** Signature lines: "Prepared by" and the client's Conforme on quotations, "Received by" on receipts. */
+function signatures(data: InvoiceData): string {
+  if (data.kind !== "quotation" && data.kind !== "receipt") return "";
+  const signer = esc(data.signer) || "&nbsp;";
+  if (data.kind === "receipt") {
+    return `<div class="signs"><div></div><div class="sign"><strong>${signer}</strong>Received by (signature over printed name)</div></div>`;
+  }
+  return `<div class="signs"><div class="sign"><strong>${signer}</strong>Prepared by</div><div class="sign"><strong>&nbsp;</strong>Conforme: ${esc(data.to.name) || "client"} (signature over printed name and date)</div></div>`;
 }
