@@ -34,7 +34,7 @@ These match published 2026 schedules from several payroll guides, but no agency 
 
 ## Real devices
 
-- [ ] Real iPhone (Safari): drop a HEIC photo, run Background Remover, ID Photo Maker, Compress PDF, Sign PDF with a finger, and "Save as PDF" from the resume and invoice editors. Tests used Playwright's WebKit on Windows, which is not real Safari.
+- [ ] Real iPhone (Safari): drop a HEIC photo, run Background Remover, ID Photo Maker, Compress PDF, Sign PDF with a finger, "Save as PDF" from the resume editor, and Download PDF from the invoice editor. Tests used Playwright's WebKit on Windows, which is not real Safari.
 - [ ] Real mid-range Android phone (Chrome): same flows, plus a 12 MP camera photo and a 30+ page PDF. Note any out-of-memory crash.
 - [ ] Install as an app (Add to Home Screen) on both, then use it in airplane mode.
 - [ ] "Make offline-ready" on a phone over mobile data: check the 80 MB download completes and the success message appears.
@@ -62,6 +62,7 @@ These match published 2026 schedules from several payroll guides, but no agency 
 - [ ] **Audio Trimmer** on an iPhone voice memo (M4A), an Android recording and an MP3: Same as original must not re-encode; FLAC/ALAC in Safari and Firefox must show the cannot-decode message, not a broken file.
 - [ ] **Loan & Amortization Calculator**: compare a real bank or Pag-IBIG disclosure statement (diminishing) and a lending app offer (add-on); the monthly payment should match within rounding, apart from fees. Check that the CSV opens in Excel and Google Sheets.
 - [ ] **EXIF & Metadata Remover** with an iPhone HEIC photo that has location on (the report must show the original's GPS and camera) and a rotated JPG portrait (Keep photo upright on: upright and byte-identical pixels; off: sideways).
+- [ ] **Invoice Generator Download PDF** with a real logo (PNG, JPG and WebP) and a 30-item invoice in PHP, USD and JPY: opens in Adobe Reader, Chrome and a phone viewer, text is selectable, totals match the preview, and an old saved draft (before currencies) still opens in PHP.
 - [ ] **Signature Extractor** with real phone photos (lamp light, shadow across the page, blue ballpen, lined paper); then place the saved signature in Sign PDF.
 - [ ] **Extract Frames**: every 1 s over a 1-minute 1080p clip as JPG (ZIP of about 60 images), and three picked moments as PNG. Check the frames match the player at those times.
 - [ ] Real PDFs from government portals and banks through Merge, Compress, Sign and Protect/Unlock; open the outputs in Adobe Reader, Chrome and a phone viewer.
