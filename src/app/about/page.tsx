@@ -45,7 +45,7 @@ export default function AboutPage() {
     >
       <ContentSection title="What Krea is">
         <p>
-          60 tools for photos, PDFs, documents, video and audio, made with Philippine paperwork in mind: 2x2 and passport photos, 200 KB upload limits, short and
+          63 tools for photos, PDFs, documents, video and audio, made with Philippine paperwork in mind: 2x2 and passport photos, 200 KB upload limits, short and
           long bond paper, invoices, quotations and acknowledgement receipts in pesos or other currencies, a take-home pay calculator for SSS, PhilHealth, Pag-IBIG and withholding tax, and an 8% vs graduated tax calculator for freelancers.
         </p>
         <p>

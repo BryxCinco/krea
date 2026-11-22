@@ -6,7 +6,7 @@ export const contentType = "image/png";
 
 export default function Image() {
   return ogImage({
-    eyebrow: "60 tools, zero uploads",
+    eyebrow: "63 tools, zero uploads",
     title: "Your files never leave your device.",
     subtitle: "Compress, convert, sign and protect images and PDFs, plus resumes, invoices and QR codes. Free, private, works offline.",
   });
