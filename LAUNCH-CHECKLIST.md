@@ -63,6 +63,12 @@ These match published 2026 schedules from several payroll guides, but no agency 
 - [ ] **Loan & Amortization Calculator**: compare a real bank or Pag-IBIG disclosure statement (diminishing) and a lending app offer (add-on); the monthly payment should match within rounding, apart from fees. Check that the CSV opens in Excel and Google Sheets.
 - [ ] **EXIF & Metadata Remover** with an iPhone HEIC photo that has location on (the report must show the original's GPS and camera) and a rotated JPG portrait (Keep photo upright on: upright and byte-identical pixels; off: sideways).
 - [ ] **Invoice Generator Download PDF** with a real logo (PNG, JPG and WebP) and a 30-item invoice in PHP, USD and JPY: opens in Adobe Reader, Chrome and a phone viewer, text is selectable, totals match the preview, and an old saved draft (before currencies) still opens in PHP.
+- [ ] **PDF to Word & Text** on a real contract, a two-column paper and a scanned PDF: the .docx opens in Word, Google Docs and WPS, headings and paragraphs look right, and the scan points to OCR.
+- [ ] **Compare PDFs** with two versions of a real lease or contract (one re-wrapped): only real wording changes are listed, with the right pages.
+- [ ] **Quotation & Receipt Maker**: a quotation and a receipt in PHP and USD with a logo, Download PDF and Print; switching Quotation to Receipt keeps the items; the Invoice Generator's saved data is untouched.
+- [ ] **Freelancer Tax Calculator**: three real cases with an accountant (pure 8%, OSD, mixed income with 2307s), then confirm `src/config/ph-income-tax.ts` against BIR issuances and set VERIFICATION_STATUS.
+- [ ] **Image Annotator** on a phone and a desktop: paste a screenshot, place every mark type, save PNG and JPG at full resolution, and check marks land where tapped.
+- [ ] **Excel to PDF** with real workbooks from Excel, Google Sheets and WPS (dates, peso amounts, percentages, hidden sheets, a 2,000-row sheet).
 - [ ] **Signature Extractor** with real phone photos (lamp light, shadow across the page, blue ballpen, lined paper); then place the saved signature in Sign PDF.
 - [ ] **Extract Frames**: every 1 s over a 1-minute 1080p clip as JPG (ZIP of about 60 images), and three picked moments as PNG. Check the frames match the player at those times.
 - [ ] Real PDFs from government portals and banks through Merge, Compress, Sign and Protect/Unlock; open the outputs in Adobe Reader, Chrome and a phone viewer.

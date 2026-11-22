@@ -130,7 +130,7 @@ export const tools: Tool[] = [
   signatureExtract,
   // Milestone 8 (54)
   loan,
-  // Milestone 10 (55-60)
+  // Milestone 10 (55-60): PDF to Word, Compare PDFs, Quotation & Receipt, Freelancer Tax, Image Annotator, Excel to PDF
   pdfToWord,
   comparePdf,
   quotation,
