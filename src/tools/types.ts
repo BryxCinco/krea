@@ -168,7 +168,13 @@ export type IconKey =
   | "finalpay"
   | "audiotrim"
   | "sigextract"
-  | "loan";
+  | "loan"
+  | "excel-pdf"
+  | "pdf-word"
+  | "compare"
+  | "quote"
+  | "tax"
+  | "markup";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
@@ -188,7 +194,7 @@ export interface Faq {
 }
 
 export interface Tool {
-  /** Stable number from the product spec (1-54). */
+  /** Stable number from the product spec (1-60). */
   id: number;
   /**
    * "file" (default): transforms files on the Stage, runs in a worker.

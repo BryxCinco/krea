@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Compare } from "@/components/ui/compare";
 import { CropBox } from "@/components/ui/crop-box";
 import { kindOfMime } from "@/lib/chains";
-import { CSV_MIME, formatBytes, IMAGE_MIMES, PDF_MIME, TEXT_MIME, TSV_MIME, ZIP_MIME } from "@/lib/file-type";
+import { CSV_MIME, formatBytes, IMAGE_MIMES, PDF_MIME, TEXT_MIME, TSV_MIME, XLSX_MIME, ZIP_MIME } from "@/lib/file-type";
 import { useSession } from "@/lib/session";
 import { useFocusTrap } from "@/lib/use-focus-trap";
 import { useMediaQuery } from "@/lib/use-media-query";
@@ -53,6 +53,7 @@ const FORMAT_LABELS: Record<string, string> = {
   [CSV_MIME]: "CSV",
   [TSV_MIME]: "TSV",
   [ZIP_MIME]: "ZIP",
+  [XLSX_MIME]: "XLSX",
 };
 
 /** File-picker extensions per MIME type, since browsers disagree on text and ZIP types (Windows calls CSV application/vnd.ms-excel). */
@@ -61,9 +62,10 @@ const PICKER_EXTENSIONS: Record<string, string[]> = {
   [CSV_MIME]: [".csv"],
   [TSV_MIME]: [".tsv"],
   [ZIP_MIME]: [".zip"],
+  [XLSX_MIME]: [".xlsx", ".xlsm"],
 };
 
-const ALL_MIMES = [...IMAGE_MIMES, PDF_MIME, TEXT_MIME, CSV_MIME, TSV_MIME, ZIP_MIME];
+const ALL_MIMES = [...IMAGE_MIMES, PDF_MIME, TEXT_MIME, CSV_MIME, TSV_MIME, ZIP_MIME, XLSX_MIME];
 
 const RAIL_WIDTH = 320;
 

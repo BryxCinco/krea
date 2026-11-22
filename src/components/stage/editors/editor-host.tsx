@@ -44,6 +44,9 @@ const editors = {
   "signature-extractor": dynamic(() => import("./signature-extract-editor"), { ssr: false, loading: EditorSkeleton }),
   "ph-final-pay-calculator": dynamic(() => import("./final-pay-editor"), { ssr: false, loading: EditorSkeleton }),
   "loan-amortization-calculator": dynamic(() => import("./loan-editor"), { ssr: false, loading: EditorSkeleton }),
+  "quotation-receipt-maker": dynamic(() => import("./quote-editor"), { ssr: false, loading: EditorSkeleton }),
+  "freelancer-tax-calculator": dynamic(() => import("./freelancer-tax-editor"), { ssr: false, loading: EditorSkeleton }),
+  "image-annotator": dynamic(() => import("./annotate-image-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 
 export function EditorHost({ slug }: { slug: string }) {

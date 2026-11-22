@@ -5,6 +5,7 @@
  * Everything else (Moves on the Stage, the card grid, the Command Palette, the
  * /tools/[slug] route, Render Chains and the workers) reads from this list.
  */
+import { annotateImage } from "./image/annotate-image";
 import { audioTrim } from "./image/audio-trim";
 import { collage } from "./image/collage";
 import { compress } from "./image/compress";
@@ -30,17 +31,20 @@ import { videoTrim } from "./image/video-trim";
 import { videoWatermark } from "./image/video-watermark";
 import { watermark } from "./image/watermark";
 import { annotatePdf } from "./pdf/annotate";
+import { comparePdf } from "./pdf/compare-pdf";
 import { compressPdf } from "./pdf/compress-pdf";
 import { cropPdf } from "./pdf/crop-pdf";
 import { flattenPdf } from "./pdf/flatten-pdf";
 import { formFiller } from "./pdf/form-filler";
 import { csvToPdf } from "./pdf/csv-to-pdf";
+import { excelToPdf } from "./pdf/excel-to-pdf";
 import { imageToPdf } from "./pdf/image-to-pdf";
 import { merge } from "./pdf/merge";
 import { ocr } from "./pdf/ocr";
 import { organizePdf } from "./pdf/organize-pdf";
 import { pageNumbers } from "./pdf/page-numbers";
 import { pdfToImage } from "./pdf/pdf-to-image";
+import { pdfToWord } from "./pdf/pdf-to-word";
 import { protectPdf } from "./pdf/protect-pdf";
 import { redactPdf } from "./pdf/redact-pdf";
 import { signPdf } from "./pdf/sign-pdf";
@@ -50,6 +54,7 @@ import { watermarkPdf } from "./pdf/watermark-pdf";
 import { zipToPdf } from "./pdf/zip-to-pdf";
 import { barcode } from "./text/barcode";
 import { finalPay } from "./text/final-pay";
+import { freelancerTax } from "./text/freelancer-tax";
 import { invoice } from "./text/invoice";
 import { loan } from "./text/loan";
 import { markdown } from "./text/markdown";
@@ -57,6 +62,7 @@ import { password } from "./text/password";
 import { payroll } from "./text/payroll";
 import { phPay } from "./text/ph-pay";
 import { qr } from "./text/qr";
+import { quotation } from "./text/quotation";
 import { resume } from "./text/resume";
 import { textToolkit } from "./text/text-toolkit";
 import type { Move, Tool, ToolCategory } from "./types";
@@ -124,6 +130,13 @@ export const tools: Tool[] = [
   signatureExtract,
   // Milestone 8 (54)
   loan,
+  // Milestone 10 (55-60): PDF to Word, Compare PDFs, Quotation & Receipt, Freelancer Tax, Image Annotator, Excel to PDF
+  pdfToWord,
+  comparePdf,
+  quotation,
+  freelancerTax,
+  annotateImage,
+  excelToPdf,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
