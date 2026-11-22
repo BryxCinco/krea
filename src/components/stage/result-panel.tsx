@@ -106,8 +106,8 @@ export function ResultPanel({ result, inputBytes, stale, title, onReuse }: Resul
   const { files, note, view } = result;
   const outputBytes = files.reduce((sum, file) => sum + file.blob.size, 0);
   const change = inputBytes ? Math.round((outputBytes / inputBytes - 1) * 100) : 0;
-  // Palettes and text are not files you would keep editing on the Stage.
-  const reusable = files.every((file) => file.type.startsWith("image/") || file.type === "application/pdf");
+  // Palettes and text are not files you would keep editing on the Stage, and SVG has no Stage tools.
+  const reusable = files.every((file) => (file.type.startsWith("image/") && file.type !== "image/svg+xml") || file.type === "application/pdf");
   const showSize = !view || (view.type === "text" && view.keepSize === true);
 
   return (

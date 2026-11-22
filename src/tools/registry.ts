@@ -13,6 +13,7 @@ import { convert } from "./image/convert";
 import { cropRotate } from "./image/crop-rotate";
 import { docScan } from "./image/doc-scan";
 import { idPhoto } from "./image/id-photo";
+import { imageToSvg } from "./image/image-to-svg";
 import { palette } from "./image/palette";
 import { removeBackground } from "./image/remove-background";
 import { redact } from "./image/redact";
@@ -140,6 +141,7 @@ export const tools: Tool[] = [
   excelToPdf,
   // Milestone 11 (61-63): image conversions
   svgConvert,
+  imageToSvg,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

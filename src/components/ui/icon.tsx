@@ -44,6 +44,7 @@ import {
   Clapperboard,
   ClipboardPen,
   Scissors,
+  Shapes,
   Sheet,
   SquarePen,
   Gauge,
@@ -122,6 +123,7 @@ const icons: Record<IconKey, LucideIcon> = {
   tax: BadgePercent,
   markup: SquarePen,
   svg: FileCode,
+  trace: Shapes,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

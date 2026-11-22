@@ -175,7 +175,8 @@ export type IconKey =
   | "quote"
   | "tax"
   | "markup"
-  | "svg";
+  | "svg"
+  | "trace";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
