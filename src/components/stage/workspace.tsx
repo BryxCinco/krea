@@ -63,16 +63,22 @@ const PICKER_EXTENSIONS: Record<string, string[]> = {
   [TSV_MIME]: [".tsv"],
   [ZIP_MIME]: [".zip"],
   [XLSX_MIME]: [".xlsx", ".xlsm"],
+  // Windows saves some downloaded JPEGs as .jfif; list it so the picker shows them.
+  "image/jpeg": [".jpg", ".jpeg", ".jfif", ".jpe"],
 };
 
 const ALL_MIMES = [...IMAGE_MIMES, PDF_MIME, TEXT_MIME, CSV_MIME, TSV_MIME, ZIP_MIME, XLSX_MIME];
 
 const RAIL_WIDTH = 320;
 
-export function Workspace({ lockedSlug }: { lockedSlug?: string }) {
+/** `preset` starts the locked tool with some settings chosen (conversion landing pages). */
+export function Workspace({ lockedSlug, preset }: { lockedSlug?: string; preset?: OptionValues }) {
   const { files, addFiles, clearFiles, reorderFiles, addRecent, setNotice } = useSession();
   const [pickedSlug, setPickedSlug] = useState<string | null>(null);
-  const [optionsBySlug, setOptionsBySlug] = useState<Record<string, OptionValues>>({});
+  const [optionsBySlug, setOptionsBySlug] = useState<Record<string, OptionValues>>(() => {
+    const locked = lockedSlug && preset ? getTool(lockedSlug) : undefined;
+    return locked ? { [locked.slug]: { ...defaultOptions(locked), ...preset } } : {};
+  });
   const [chain, setChain] = useState<Chain | null>(null);
   const [run, setRun] = useState<RunState | null>(null);
   const [dragging, setDragging] = useState(false);

@@ -22,10 +22,10 @@ interface Item {
   output?: WorkFile;
 }
 
-export default function HeicConvertEditor() {
+export default function HeicConvertEditor({ preset }: { preset?: Record<string, string> }) {
   // Photos stay in memory only, until the tab is closed.
   const [items, setItems] = useState<Item[]>([]);
-  const [target, setTarget] = useState<Target>("image/jpeg");
+  const [target, setTarget] = useState<Target>(preset?.format === "image/png" ? "image/png" : "image/jpeg");
   const [quality, setQuality] = useState(90);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState("");

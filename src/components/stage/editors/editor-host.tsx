@@ -6,6 +6,7 @@
  * tool page itself stays light and fully static.
  */
 import dynamic from "next/dynamic";
+import type { ComponentType } from "react";
 
 function EditorSkeleton() {
   return (
@@ -51,7 +52,10 @@ const editors = {
   "heic-converter": dynamic(() => import("./heic-convert-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 
-export function EditorHost({ slug }: { slug: string }) {
-  const Editor = editors[slug as keyof typeof editors];
-  return Editor ? <Editor /> : null;
+/** Settings an editor may start with (conversion landing pages pass the output format). */
+export type EditorPreset = Record<string, string>;
+
+export function EditorHost({ slug, preset }: { slug: string; preset?: EditorPreset }) {
+  const Editor = editors[slug as keyof typeof editors] as ComponentType<{ preset?: EditorPreset }> | undefined;
+  return Editor ? <Editor preset={preset} /> : null;
 }

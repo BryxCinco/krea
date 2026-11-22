@@ -71,10 +71,12 @@ async function rasterize(item: Item, width: number, height: number, format: Form
   }
 }
 
-export default function SvgConvertEditor() {
+const FORMATS: Format[] = ["image/png", "image/jpeg", "image/webp"];
+
+export default function SvgConvertEditor({ preset }: { preset?: Record<string, string> }) {
   // Files live in memory only, until the tab is closed.
   const [items, setItems] = useState<Item[]>([]);
-  const [format, setFormat] = useState<Format>("image/png");
+  const [format, setFormat] = useState<Format>(() => FORMATS.find((entry) => entry === preset?.format) ?? "image/png");
   const [mode, setMode] = useState<"scale" | "width">("scale");
   const [scale, setScale] = useState("2");
   const [width, setWidth] = useState(1024);

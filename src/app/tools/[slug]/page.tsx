@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronDown, ShieldCheck } from "lucide-react";
+import { ArrowRight, ChevronDown, ShieldCheck } from "lucide-react";
 import { EditorHost } from "@/components/stage/editors/editor-host";
 import { Workspace } from "@/components/stage/workspace";
 import { ToolCard } from "@/components/ui/tool-card";
+import { conversionsFor } from "@/config/conversions";
 import { absoluteUrl, jsonLd, SITE_NAME } from "@/lib/site";
 import { categories, getTool, relatedTools, tools } from "@/tools/registry";
 
@@ -33,6 +34,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
   if (!tool) notFound();
   const category = categories.find((entry) => entry.id === tool.category)!;
   const related = relatedTools(tool);
+  const conversions = conversionsFor(tool.slug);
   const url = absoluteUrl(`/tools/${tool.slug}`);
 
   const structuredData = [
@@ -128,6 +130,26 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
           </div>
         </section>
       </div>
+
+      {conversions.length > 0 && (
+        <section aria-labelledby="conversions" className="border-t border-line">
+          <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
+            <h2 id="conversions" className="text-2xl font-semibold tracking-tight text-fg">
+              Popular conversions
+            </h2>
+            <ul className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {conversions.map((entry) => (
+                <li key={entry.slug}>
+                  <Link href={`/convert/${entry.slug}`} className="flex min-h-11 items-center justify-between gap-2 rounded-lg border border-line px-4 text-sm text-fg hover:border-accent">
+                    {entry.from} to {entry.to}
+                    <ArrowRight aria-hidden className="size-4 text-muted" strokeWidth={1.75} />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       {related.length > 0 && (
         <section aria-labelledby="related" className="border-t border-line">
