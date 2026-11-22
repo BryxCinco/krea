@@ -174,7 +174,10 @@ export type IconKey =
   | "compare"
   | "quote"
   | "tax"
-  | "markup";
+  | "markup"
+  | "svg"
+  | "trace"
+  | "heic";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
@@ -194,7 +197,7 @@ export interface Faq {
 }
 
 export interface Tool {
-  /** Stable number from the product spec (1-60). */
+  /** Stable number from the product spec (1-63). */
   id: number;
   /**
    * "file" (default): transforms files on the Stage, runs in a worker.

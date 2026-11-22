@@ -64,6 +64,9 @@ export async function detectFileType(file: Blob, fileName = ""): Promise<Detecte
   }
 
   const name = fileName.toLowerCase();
+  if (name.endsWith(".svg") || file.type === "image/svg+xml") {
+    return { kind: "unknown", mime: "image/svg+xml", unsupported: "SVG files open in the SVG Converter: it turns them into PNG, JPG or WebP." };
+  }
   // ZIP. Word, Excel and PowerPoint files are ZIPs too, so only real .zip files (or nameless pastes) count.
   if (ascii(bytes, 0, 2) === "PK" && (startsWith(bytes, [0x03, 0x04], 2) || startsWith(bytes, [0x05, 0x06], 2))) {
     if (/\.(xlsx|xlsm)$/.test(name)) return { kind: "text", mime: XLSX_MIME };

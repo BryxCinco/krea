@@ -12,13 +12,16 @@ import { compress } from "./image/compress";
 import { convert } from "./image/convert";
 import { cropRotate } from "./image/crop-rotate";
 import { docScan } from "./image/doc-scan";
+import { heicConvert } from "./image/heic-convert";
 import { idPhoto } from "./image/id-photo";
+import { imageToSvg } from "./image/image-to-svg";
 import { palette } from "./image/palette";
 import { removeBackground } from "./image/remove-background";
 import { redact } from "./image/redact";
 import { resize } from "./image/resize";
 import { signatureExtract } from "./image/signature-extract";
 import { signatureMaker } from "./image/signature-maker";
+import { svgConvert } from "./image/svg-convert";
 import { stripMetadataTool } from "./image/strip-metadata";
 import { upscale } from "./image/upscale";
 import { video } from "./image/video";
@@ -137,6 +140,10 @@ export const tools: Tool[] = [
   freelancerTax,
   annotateImage,
   excelToPdf,
+  // Milestone 11 (61-63): image conversions
+  svgConvert,
+  imageToSvg,
+  heicConvert,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [

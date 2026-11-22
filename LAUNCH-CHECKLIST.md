@@ -69,6 +69,10 @@ These match published 2026 schedules from several payroll guides, but no agency 
 - [ ] **Freelancer Tax Calculator**: three real cases with an accountant (pure 8%, OSD, mixed income with 2307s), then confirm `src/config/ph-income-tax.ts` against BIR issuances and set VERIFICATION_STATUS.
 - [ ] **Image Annotator** on a phone and a desktop: paste a screenshot, place every mark type, save PNG and JPG at full resolution, and check marks land where tapped.
 - [ ] **Excel to PDF** with real workbooks from Excel, Google Sheets and WPS (dates, peso amounts, percentages, hidden sheets, a 2,000-row sheet).
+- [ ] **HEIC Converter** with real iPhone photos on Chrome or Edge (heic-to) and Safari (native): PNG and JPG, a batch of 20, and Live Photo or burst HEICs.
+- [ ] **SVG Converter** with SVGs exported from Figma, Illustrator, Inkscape and Canva (text, gradients, embedded images), at 4x and at 4,000 px wide.
+- [ ] **Image to SVG** on a real logo (2-6 colours), a scanned signature (black and white) and a photo (should warn or be large); open the SVGs in Figma, Inkscape and Illustrator.
+- [ ] **Conversion pages** (/convert/...): submit the sitemap in Search Console and check that each page is indexed under its own canonical URL.
 - [ ] **Signature Extractor** with real phone photos (lamp light, shadow across the page, blue ballpen, lined paper); then place the saved signature in Sign PDF.
 - [ ] **Extract Frames**: every 1 s over a 1-minute 1080p clip as JPG (ZIP of about 60 images), and three picked moments as PNG. Check the frames match the player at those times.
 - [ ] Real PDFs from government portals and banks through Merge, Compress, Sign and Protect/Unlock; open the outputs in Adobe Reader, Chrome and a phone viewer.
