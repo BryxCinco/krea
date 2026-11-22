@@ -11,6 +11,7 @@ import {
   FileImage,
   FilePen,
   FileUser,
+  FileDiff,
   FileOutput,
   FileSpreadsheet,
   FileText,
@@ -112,6 +113,7 @@ const icons: Record<IconKey, LucideIcon> = {
   loan: Landmark,
   "excel-pdf": Sheet,
   "pdf-word": FileText,
+  compare: FileDiff,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

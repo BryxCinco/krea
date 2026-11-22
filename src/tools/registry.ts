@@ -30,6 +30,7 @@ import { videoTrim } from "./image/video-trim";
 import { videoWatermark } from "./image/video-watermark";
 import { watermark } from "./image/watermark";
 import { annotatePdf } from "./pdf/annotate";
+import { comparePdf } from "./pdf/compare-pdf";
 import { compressPdf } from "./pdf/compress-pdf";
 import { cropPdf } from "./pdf/crop-pdf";
 import { flattenPdf } from "./pdf/flatten-pdf";
@@ -128,6 +129,7 @@ export const tools: Tool[] = [
   loan,
   // Milestone 10 (55-60)
   pdfToWord,
+  comparePdf,
   excelToPdf,
 ];
 

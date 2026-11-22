@@ -170,7 +170,8 @@ export type IconKey =
   | "sigextract"
   | "loan"
   | "excel-pdf"
-  | "pdf-word";
+  | "pdf-word"
+  | "compare";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
