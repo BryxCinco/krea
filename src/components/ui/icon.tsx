@@ -12,6 +12,7 @@ import {
   FileImage,
   FilePen,
   FileUser,
+  FileCode,
   FileDiff,
   FileOutput,
   FileSpreadsheet,
@@ -120,6 +121,7 @@ const icons: Record<IconKey, LucideIcon> = {
   quote: NotebookPen,
   tax: BadgePercent,
   markup: SquarePen,
+  svg: FileCode,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

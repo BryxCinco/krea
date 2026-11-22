@@ -174,7 +174,8 @@ export type IconKey =
   | "compare"
   | "quote"
   | "tax"
-  | "markup";
+  | "markup"
+  | "svg";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

@@ -19,6 +19,7 @@ import { redact } from "./image/redact";
 import { resize } from "./image/resize";
 import { signatureExtract } from "./image/signature-extract";
 import { signatureMaker } from "./image/signature-maker";
+import { svgConvert } from "./image/svg-convert";
 import { stripMetadataTool } from "./image/strip-metadata";
 import { upscale } from "./image/upscale";
 import { video } from "./image/video";
@@ -137,6 +138,8 @@ export const tools: Tool[] = [
   freelancerTax,
   annotateImage,
   excelToPdf,
+  // Milestone 11 (61-63): image conversions
+  svgConvert,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
