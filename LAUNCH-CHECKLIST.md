@@ -73,6 +73,8 @@ These match published 2026 schedules from several payroll guides, but no agency 
 - [ ] **SVG Converter** with SVGs exported from Figma, Illustrator, Inkscape and Canva (text, gradients, embedded images), at 4x and at 4,000 px wide.
 - [ ] **Image to SVG** on a real logo (2-6 colours), a scanned signature (black and white) and a photo (should warn or be large); open the SVGs in Figma, Inkscape and Illustrator.
 - [ ] **Conversion pages** (/convert/...): submit the sitemap in Search Console and check that each page is indexed under its own canonical URL.
+- [ ] **Translation models release**: create the GitHub Release `translate-models-v1` and upload the 12 files listed in `TRANSLATE_FILES` (copy-assets.mjs). Without it the deployed build warns and the translator says the models are unavailable.
+- [ ] **Tagalog-English Translator** on a mid-range Android phone and an iPhone: first download over mobile data, then offline; check memory with both directions loaded, and review sample translations with a native speaker.
 - [ ] **Signature Extractor** with real phone photos (lamp light, shadow across the page, blue ballpen, lined paper); then place the saved signature in Sign PDF.
 - [ ] **Extract Frames**: every 1 s over a 1-minute 1080p clip as JPG (ZIP of about 60 images), and three picked moments as PNG. Check the frames match the player at those times.
 - [ ] Real PDFs from government portals and banks through Merge, Compress, Sign and Protect/Unlock; open the outputs in Adobe Reader, Chrome and a phone viewer.

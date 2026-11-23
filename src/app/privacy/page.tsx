@@ -60,6 +60,9 @@ export default function PrivacyPage() {
             now served from this site, so the publisher receives nothing from you.
           </li>
           <li>
+            <strong>Translation AI models</strong> (Opus-MT by the University of Helsinki, Apache-2.0): about 140 MB for each direction, English to Tagalog and Tagalog to English, plus a 21 MB runtime. Used by the Tagalog-English Translator, downloaded from this site the first time you translate. The text you translate stays in your browser.
+          </li>
+          <li>
             <strong>Fonts</strong> are bundled with the site at build time, not loaded from a font service.
           </li>
         </ul>
