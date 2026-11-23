@@ -177,7 +177,8 @@ export type IconKey =
   | "markup"
   | "svg"
   | "trace"
-  | "heic";
+  | "heic"
+  | "translate";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";

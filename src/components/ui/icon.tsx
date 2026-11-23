@@ -29,6 +29,7 @@ import {
   LockKeyhole,
   KeyRound,
   Landmark,
+  Languages,
   Layers,
   Maximize2,
   NotebookPen,
@@ -126,6 +127,7 @@ const icons: Record<IconKey, LucideIcon> = {
   svg: FileCode,
   trace: Shapes,
   heic: Smartphone,
+  translate: Languages,
 };
 
 export function ToolIcon({ name, className }: { name: IconKey; className?: string }) {

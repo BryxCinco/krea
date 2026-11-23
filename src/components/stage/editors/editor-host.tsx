@@ -50,6 +50,7 @@ const editors = {
   "image-annotator": dynamic(() => import("./annotate-image-editor"), { ssr: false, loading: EditorSkeleton }),
   "svg-converter": dynamic(() => import("./svg-convert-editor"), { ssr: false, loading: EditorSkeleton }),
   "heic-converter": dynamic(() => import("./heic-convert-editor"), { ssr: false, loading: EditorSkeleton }),
+  "tagalog-english-translator": dynamic(() => import("./translate-editor"), { ssr: false, loading: EditorSkeleton }),
 } as const;
 
 /** Settings an editor may start with (conversion landing pages pass the output format). */
