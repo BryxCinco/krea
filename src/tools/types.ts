@@ -177,7 +177,8 @@ export type IconKey =
   | "markup"
   | "svg"
   | "trace"
-  | "heic";
+  | "heic"
+  | "translate";
 
 /** What a tool produces, used to check that chain steps fit together. */
 export type OutputKind = "image" | "pdf" | "text" | "data";
@@ -197,7 +198,7 @@ export interface Faq {
 }
 
 export interface Tool {
-  /** Stable number from the product spec (1-63). */
+  /** Stable number from the product spec (1-64). */
   id: number;
   /**
    * "file" (default): transforms files on the Stage, runs in a worker.

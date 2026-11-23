@@ -6,7 +6,7 @@
  * User files never pass through here: they are read from memory in the page
  * and are never part of any request. Krea makes no third-party requests.
  */
-const VERSION = "krea-v12";
+const VERSION = "krea-v13";
 /** Pages and build assets. Replaced on every deploy that bumps VERSION. */
 const SHELL = `${VERSION}-shell`;
 /**

@@ -66,7 +66,8 @@ export default function HowItWorksPage() {
       <ContentSection id="limits" title="Honest limits">
         <ul>
           <li>Speed and file size depend on your device. Very large photos (over about 80 megapixels) are refused to avoid running out of memory.</li>
-          <li>The first use of OCR or background removal waits for the engine to download (16 MB and about 56 MB).</li>
+          <li>The first use of OCR or background removal waits for the engine to download (16 MB and about 56 MB). The first translation downloads its model, about 140 MB for each direction.</li>
+          <li>Translation is a guide: good for short, simple sentences, weak on long text, idioms and Taglish.</li>
           <li>The Invoice Generator makes its PDF directly on your device. Save as PDF in the other document editors uses your browser&apos;s print dialog. Some in-app browsers (inside chat or social apps) block it; open Krea in your normal browser.</li>
           <li>Compress PDF only recompresses photos inside the PDF and optimizes its structure. It never turns pages into pictures, so some PDFs barely shrink.</li>
         </ul>

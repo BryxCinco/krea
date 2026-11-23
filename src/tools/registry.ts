@@ -68,6 +68,7 @@ import { qr } from "./text/qr";
 import { quotation } from "./text/quotation";
 import { resume } from "./text/resume";
 import { textToolkit } from "./text/text-toolkit";
+import { translate } from "./text/translate";
 import type { Move, Tool, ToolCategory } from "./types";
 
 export const tools: Tool[] = [
@@ -144,6 +145,8 @@ export const tools: Tool[] = [
   svgConvert,
   imageToSvg,
   heicConvert,
+  // Milestone 12 (64)
+  translate,
 ];
 
 export const categories: { id: ToolCategory; label: string }[] = [
